@@ -1,0 +1,1661 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Brigade Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+<style>
+:root{
+  --bg:#F2F4F1; --surface:#FFFFFF; --surface-2:#F7F8F6; --ink:#17201C; --ink-2:#44514B; --muted:#6B7872;
+  --line:#DCE1DD; --line-2:#EAEEEA;
+  --accent:#12684C; --accent-ink:#FFFFFF; --accent-soft:#E2F0EA;
+  --chef:#9A5B00; --chef-soft:#FBEEDA; --sys:#3E5470; --sys-soft:#E6ECF3; --ia:#5B45C2; --ia-soft:#ECE8FB;
+  --ok:#1E7B4A; --ok-soft:#E1F3E8; --warn:#9A6400; --warn-soft:#FCF0D8; --crit:#B3261E; --crit-soft:#FBE4E2;
+  --s-ca:#138560; --s-achat:#C2771B;
+  --f-body:"Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-disp:"Bricolage Grotesque", "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#101513; --surface:#161D1A; --surface-2:#1B2320; --ink:#E7ECE9; --ink-2:#B9C4BF; --muted:#8E9B95;
+    --line:#2A3531; --line-2:#222C28;
+    --accent:#4CC096; --accent-ink:#06140F; --accent-soft:#16342A;
+    --chef:#E9A845; --chef-soft:#33260F; --sys:#9BB3D1; --sys-soft:#1D2735; --ia:#A898F2; --ia-soft:#262045;
+    --ok:#5CCB8C; --ok-soft:#153225; --warn:#E8B04E; --warn-soft:#33280F; --crit:#F08A80; --crit-soft:#3A1916;
+    --s-ca:#3AA57C; --s-achat:#C9822F;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101513; --surface:#161D1A; --surface-2:#1B2320; --ink:#E7ECE9; --ink-2:#B9C4BF; --muted:#8E9B95;
+  --line:#2A3531; --line-2:#222C28;
+  --accent:#4CC096; --accent-ink:#06140F; --accent-soft:#16342A;
+  --chef:#E9A845; --chef-soft:#33260F; --sys:#9BB3D1; --sys-soft:#1D2735; --ia:#A898F2; --ia-soft:#262045;
+  --ok:#5CCB8C; --ok-soft:#153225; --warn:#E8B04E; --warn-soft:#33280F; --crit:#F08A80; --crit-soft:#3A1916;
+  --s-ca:#3AA57C; --s-achat:#C9822F;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14.5px;line-height:1.5;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:1180px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:26px;font-weight:700}
+h2{font-size:19px;font-weight:700}
+h3{font-size:15px;font-weight:600;font-family:var(--f-body)}
+.num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:18px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand .sub{font-size:12.5px;color:var(--muted)}
+.chain{display:flex;gap:4px;flex-wrap:wrap;align-items:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.chain b{font-weight:600;color:var(--ink-2)}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;margin-top:14px;scrollbar-width:none}
+nav.tabs button{background:none;border:0;padding:10px 14px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;color:var(--ink-2);font-weight:500}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+nav.tabs button .cnt{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:4px}
+
+main{padding-top:22px;display:grid;gap:18px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.panel > header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
+.panel > header p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+
+/* role chips */
+.role{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.role::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.role.chef{color:var(--chef);background:var(--chef-soft)}
+.role.sys{color:var(--sys);background:var(--sys-soft)}
+.role.ia{color:var(--ia);background:var(--ia-soft)}
+.roles{display:flex;gap:6px;flex-wrap:wrap}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.pill.ok{color:var(--ok);background:var(--ok-soft)}
+.pill.warn{color:var(--warn);background:var(--warn-soft)}
+.pill.crit{color:var(--crit);background:var(--crit-soft)}
+.pill.info{color:var(--sys);background:var(--sys-soft)}
+.pill.ia{color:var(--ia);background:var(--ia-soft)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:500;font-size:13.5px}
+.btn:hover{border-color:var(--ink-2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:none;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.danger{color:var(--crit)}
+.btn.ia{color:var(--ia);border-color:color-mix(in srgb,var(--ia) 40%,var(--line))}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,165px),1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.kpi{background:var(--surface);padding:14px 16px;display:grid;gap:2px;align-content:start}
+.kpi .l{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .d{font-size:12px;color:var(--muted)}
+.kpi.hl .v{color:var(--accent)}
+
+/* tables */
+.tw{overflow-x:auto;margin-inline:-4px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--line-2);vertical-align:top}
+td.r,th.r{text-align:right}
+td.num,td.r{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13px}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--surface-2)}
+tr.open td{background:var(--surface-2)}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+
+/* dropzone */
+.drop{border:1.5px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:var(--r);background:var(--surface-2);padding:22px;display:grid;gap:8px;justify-items:center;text-align:center;cursor:pointer;transition:background .15s}
+.drop.over{background:var(--accent-soft)}
+.drop strong{font-size:15px}
+.queue{display:grid;gap:8px;margin-top:12px}
+.qitem{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.steps{display:flex;gap:4px;flex-wrap:wrap;grid-column:1/-1}
+.step{font-size:11px;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line-2)}
+.step.done{color:var(--ok);background:var(--ok-soft);border-color:transparent}
+.step.run{color:var(--ia);background:var(--ia-soft);border-color:transparent}
+.step.err{color:var(--crit);background:var(--crit-soft);border-color:transparent}
+.step.wait{border-style:dashed}
+
+.detail{display:grid;gap:12px;padding:6px 4px 12px}
+.ai-box{border-left:3px solid var(--ia);background:var(--ia-soft);padding:10px 12px;border-radius:0 8px 8px 0;font-size:13.5px;white-space:pre-wrap}
+.ai-box .h{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ia);margin-bottom:4px;display:block}
+.alerts{display:grid;gap:6px}
+.alert{display:flex;gap:8px;align-items:flex-start;font-size:13px}
+
+/* forms */
+.field{display:grid;gap:4px}
+.field label{font-size:12px;font-weight:600;color:var(--ink-2)}
+input[type=text],input[type=number],input[type=date],select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 9px;min-width:0;width:100%}
+textarea{min-height:90px;font-family:var(--f-mono);font-size:12.5px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:12px}
+.ingr{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,1fr) auto;gap:8px;align-items:center}
+.ingr .cost{font-family:var(--f-mono);font-size:12.5px;text-align:right;color:var(--ink-2)}
+@media (max-width:560px){.ingr{grid-template-columns:1fr 1fr 1fr;}.ingr .cost{grid-column:1/3;text-align:left}}
+.allerg{display:flex;flex-wrap:wrap;gap:6px}
+.allerg label{display:inline-flex;gap:5px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:3px 10px 3px 7px;font-size:12.5px;cursor:pointer}
+.allerg input{accent-color:var(--chef)}
+.allerg label:has(input:checked){background:var(--chef-soft);border-color:transparent;color:var(--chef);font-weight:600}
+.chef-zone{border:1px solid color-mix(in srgb,var(--chef) 35%,var(--line));background:linear-gradient(var(--surface),var(--surface)) padding-box}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr));gap:10px;padding:12px;border-radius:8px;background:var(--sys-soft)}
+.calc div{display:grid}
+.calc span{font-size:11.5px;color:var(--sys);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.calc b{font-family:var(--f-mono);font-size:17px;font-weight:500}
+
+/* charts */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:10.5px}
+.chart .grid{stroke:var(--line-2);stroke-width:1}
+.chart .axis{stroke:var(--line);stroke-width:1}
+.chart text.val{fill:var(--ink-2);font-size:10px}
+.chart tspan.sub{font-size:9.5px;opacity:.8}
+.legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink-2);margin-bottom:6px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:6px 9px;border-radius:6px;font-size:12px;white-space:nowrap;transform:translate(-50%,-110%);opacity:0;transition:opacity .1s;font-family:var(--f-mono);z-index:5}
+.hbar{display:grid;grid-template-columns:minmax(90px,1.2fr) 2.5fr minmax(70px,auto);gap:8px;align-items:center;font-size:13px;padding:3px 0}
+.hbar .track{height:10px;background:var(--surface-2);border-radius:0 4px 4px 0}
+.hbar .fill{height:100%;background:var(--s-ca);border-radius:0 4px 4px 0}
+.hbar .fill.atyp{background:var(--warn)}
+.spark{display:inline-block;vertical-align:middle}
+.spark path{fill:none;stroke:var(--ink-2);stroke-width:1.5}
+.spark circle{fill:var(--accent)}
+.spark circle.bad{fill:var(--warn)}
+
+.note{font-size:12.5px;padding:10px 12px;border-radius:8px;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink-2)}
+.banner{padding:10px 14px;border-radius:8px;font-size:13px}
+.banner.warn{background:var(--warn-soft);color:var(--warn)}
+.banner.info{background:var(--sys-soft);color:var(--sys)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;max-width:100%}
+.seg button{border:0;background:var(--surface);padding:6px 11px;cursor:pointer;font-size:13px;color:var(--ink-2)}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+footer.legend-wbs{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+footer.legend-wbs > div{display:flex;gap:8px;align-items:center}
+.dim{opacity:.55}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:13px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+.version{font:500 11.5px var(--f-mono);letter-spacing:0;vertical-align:middle;margin-left:6px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.version:hover{border-color:var(--ink-2)}
+.vlist{margin:0;padding-left:0;list-style:none;display:grid;gap:4px;font-size:13px}
+.vlist b{font-family:var(--f-mono);font-weight:500;margin-right:6px}
+.confirm{display:inline-flex;gap:6px;align-items:center;font-size:12.5px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div>
+        <h1>Brigade Stock <button type="button" class="version" id="version-btn" aria-expanded="false" title="Historique des versions">V0.18</button></h1>
+        <div class="sub">Portail V1 · factures, stock théorique, fiches techniques, food cost</div>
+      </div>
+      <div class="chain" aria-label="Chaîne fonctionnelle V1">
+        <b>Factures</b>→<b>Extraction IA</b>→<b>Entrées</b>→<b>Fiches</b>→<b>Caisse</b>→<b>Conso. théorique</b>→<b>Dashboard</b>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </header>
+  <section class="panel" id="versions" hidden style="margin-top:14px">
+    <header><div><h3>Historique des versions</h3><p>Versions mineures V0.x : une par modification publiée. Le passage à une version majeure (V1.0) est décidé par la propriétaire.</p></div></header>
+    <ol class="vlist" reversed>
+      <li><b>V0.18</b> Analyse IA des alertes en parallèle de la lecture ; lecture automatique des factures en attente à l'ouverture</li>
+      <li><b>V0.17</b> Graphique : 7 j par jour (lundi…), 30 j par semaine (Semaine 1…), trimestre Mois 1 à 3, année janvier à décembre ; période « Semaine » retirée</li>
+      <li><b>V0.16</b> Numérotation des versions et historique</li>
+      <li><b>V0.15</b> Import en deux temps : import immédiat, puis lecture IA en file (reprise après fermeture de la page) ; 1 demande IA par facture ; réglages de vitesse</li>
+      <li><b>V0.14</b> Relances automatiques des échecs passagers de l'agent IA ; échecs notés dans le journal</li>
+      <li><b>V0.13</b> Import sans blocage quand l'onglet est en arrière-plan ; factures « hors stock » (droguerie seule)</li>
+      <li><b>V0.12</b> Import d'archives ZIP (plus de 100 PDF), pause et reprise sur limite d'utilisation</li>
+      <li><b>V0.11</b> Périodes Semaine, 7 j, 30 j, Mois, Trimestre, Année, Tout</li>
+      <li><b>V0.10</b> Graphique ventes / achats par jour, semaine ou mois</li>
+      <li><b>V0.9</b> Tableau de bord par date de document ; date de facture corrigeable</li>
+      <li><b>V0.8</b> Import de plusieurs factures à la fois</li>
+      <li><b>V0.7</b> Lecture des PDF numériques sans image (vues sans lecture d'images)</li>
+      <li><b>V0.1 à V0.6</b> Versions initiales du portail</li>
+    </ol>
+  </section>
+  <main id="main"></main>
+  <footer class="legend-wbs">
+    <div><span class="role chef">Chef</span> saisit et valide les données métier (fiches techniques)</div>
+    <div><span class="role sys">Système</span> traitements déterministes et calculs</div>
+    <div><span class="role ia">Agent IA</span> lecture des factures, analyses, explications</div>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+/* ============ constants ============ */
+const TODAY = new Date();
+const ALLERGENES = ["Gluten","Crustacés","Œufs","Poissons","Arachides","Soja","Lait","Fruits à coque","Céleri","Moutarde","Sésame","Sulfites","Lupin","Mollusques"];
+const STD = { kg:["kg",1], g:["kg",0.001], gr:["kg",0.001], mg:["kg",1e-6], l:["L",1], lt:["L",1], cl:["L",0.01], ml:["L",0.001], dl:["L",0.1],
+  pc:["pc",1], piece:["pc",1], u:["pc",1], un:["pc",1], unite:["pc",1], p:["pc",1] };
+const BASE_UNITS = ["kg","L","pc"];
+const RECIPE_UNITS = ["g","kg","ml","cl","L","pc"];
+const TVA_RESTO = 0.10;
+const DEFAULT_RULES = { seuilCalcul: 0.02, seuilTotal: 0.01, seuilPrix: 0.20, seuilConso: 0.35 };
+const TABS = [
+  { id:"dash", label:"Tableau de bord" },
+  { id:"factures", label:"Factures", cnt: () => Object.keys(S.factures).length },
+  { id:"stock", label:"Entrées de stock", cnt: () => Object.keys(S.produits).length },
+  { id:"fiches", label:"Fiches techniques", cnt: () => Object.keys(S.recettes).length },
+  { id:"ventes", label:"Ventes / caisse" },
+  { id:"conso", label:"Consommation théorique" },
+  { id:"acces", label:"Accès", perm:"roles" },
+];
+function tabAllowed(t){
+  if (t.perm) return can(t.perm);
+  if (can("voir")) return true;
+  if (can("factures")) return t.id === "factures" || t.id === "stock";
+  return false;
+}
+
+/* ============ state ============ */
+const S = { produits:{}, factures:{}, entrees:{}, recettes:{}, ventes:{}, analyses:{}, config:{}, roles:{}, membres:{}, journal:{} };
+const UI = { tab: "dash", period: "30", openFacture: null, editRecette: null, queue: [], anaBusy: {}, confirmDel: null };
+let db = null, sample = null, assets = null, sampleLimits = null, liveDb = false;
+/* ============ rôles applicatifs ============
+   Propriétaire : la seule personne qui fait évoluer et publie l'agent (propriétaire de la page).
+   Les autres rôles sont attribués par le propriétaire dans l'onglet « Accès » et stockés dans roles/<id>. */
+const ROLES = {
+  proprietaire: { label: "Propriétaire", desc: "Évolution et publication de l'agent, rôles, seuils, tout le reste",
+    perms: ["voir","deposer","doublons","supprimer","fiches","caisse","analyser","seuils","roles","demo","journal"] },
+  gerant: { label: "Gérant", desc: "Dépose et gère les factures (doublons, suppression), fiches, caisse, analyses",
+    perms: ["voir","deposer","doublons","supprimer","fiches","caisse","analyser","journal"] },
+  chef: { label: "Chef", desc: "Dépose les factures, saisit les fiches techniques, importe la caisse",
+    perms: ["voir","deposer","fiches","caisse","analyser"] },
+  employe: { label: "Employé", desc: "Dépose les factures et consulte factures et stock",
+    perms: ["deposer","factures"] },
+  lecteur: { label: "Lecteur", desc: "Consulte le portail sans rien modifier", perms: ["voir"] },
+  attente: { label: "En attente", desc: "Accès pas encore attribué par le propriétaire", perms: [] },
+  chargement: { label: "Vérification", desc: "Vérification de votre accès en cours", perms: [] },
+};
+const ROLE_ORDER = ["gerant","chef","employe","lecteur","attente"];
+let OWNER = false, ROLE_KNOWN = false, ME = null, userApi = null;
+const IN_VIEWER = !!(window.claude && window.claude.use);
+let ROLE_PENDING = IN_VIEWER, NO_IDENTITY = false;
+function currentRole(){
+  if (!IN_VIEWER) return "proprietaire";           // fichier ouvert hors claude.ai : mode local
+  if (ROLE_PENDING) return "chargement";
+  if (OWNER) return "proprietaire";
+  if (NO_IDENTITY) return "lecteur";
+  const r = ME && S.roles[ME]?.role;
+  return ROLES[r] ? r : "attente";
+}
+const can = a => ROLES[currentRole()].perms.includes(a);
+async function journal(action, cible, detail){
+  if (!db) return;
+  try { await db.collection("journal").add({ at: new Date().toISOString(), acteur: ME || "proprietaire", role: currentRole(), action, cible: cible || "", detail: detail || "" }); } catch(e) { console.warn(e); }
+}
+
+try { const t = localStorage.getItem("bs-tab"); if (t && TABS.some(x => x.id === t)) UI.tab = t; } catch(e) {}
+try { const pr = localStorage.getItem("bs-period"); if (["7","30","mois","trimestre","annee","tout"].includes(pr)) UI.period = pr; } catch(e) {}
+try { const hs = (location.hash||"").slice(1); if (TABS.some(x => x.id === hs)) UI.tab = hs; } catch(e) {}
+
+/* ============ utils ============ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const eur = (n, d=2) => (isFinite(n) ? n : 0).toLocaleString("fr-FR", { style:"currency", currency:"EUR", minimumFractionDigits:d, maximumFractionDigits:d });
+const nf = (n, d=2) => (isFinite(n) ? n : 0).toLocaleString("fr-FR", { maximumFractionDigits:d, minimumFractionDigits:0 });
+const pct = (n, d=1) => isFinite(n) ? (n*100).toLocaleString("fr-FR",{maximumFractionDigits:d, minimumFractionDigits:d}) + " %" : "—";
+const uid = p => p + "_" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const normUnit = u => { let n = norm(u).replace(/\s/g,""); if (STD[n]) return n; if (n.endsWith("s") && STD[n.slice(0,-1)]) return n.slice(0,-1); return n; };
+const iso = d => { const x = new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
+const fdate = s => { if (!s) return "—"; const [y,m,d] = s.split("-"); return `${d}/${m}/${y}`; };
+const addDays = (s, n) => { const d = new Date(s + "T12:00:00"); d.setDate(d.getDate()+n); return iso(d); };
+const weekStart = s => { const d = new Date(s + "T12:00:00"); const wd = (d.getDay()+6)%7; d.setDate(d.getDate()-wd); return iso(d); };
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("on"),2600); }
+
+/* ============ persistence ============ */
+const COLS = ["produits","factures","entrees","recettes","ventes","analyses","config","roles","membres","journal"];
+async function save(col, id, data){
+  S[col][id] = { id, ...data }; scheduleRender();
+  if (db) { try { await db.collection(col).doc(id).set(data); } catch(e){ console.error(e); toast("Enregistrement impossible : " + (e.code||e.message)); } }
+}
+async function patch(col, id, data){
+  S[col][id] = { ...(S[col][id]||{id}), ...data }; scheduleRender();
+  if (db) { try { await db.collection(col).doc(id).update(data); } catch(e){ try { const { id:_i, ...rest } = S[col][id]; await db.collection(col).doc(id).set(rest); } catch(e2){ console.error(e2); } } }
+}
+async function remove(col, id){
+  delete S[col][id]; scheduleRender();
+  if (db) { try { await db.collection(col).doc(id).delete(); } catch(e){ console.error(e); } }
+}
+const rules = () => { const { id, ...r } = S.config.regles || {}; return { ...DEFAULT_RULES, ...r }; };
+
+/* ============ derived: prices ============ */
+function prixProduits(){
+  const acc = {};
+  for (const e of Object.values(S.entrees)) for (const l of (e.lignes||[])) {
+    const a = acc[l.produitId] ||= { q:0, v:0, last:null, lastDate:"", n:0, fournisseurs:new Set() };
+    a.q += +l.qteBase||0; a.v += +l.montant||0; a.n++; if (e.fournisseur) a.fournisseurs.add(e.fournisseur);
+    if ((e.date||"") >= a.lastDate) { a.lastDate = e.date||""; a.last = +l.puBase; }
+  }
+  for (const a of Object.values(acc)) a.pm = a.q > 0 ? a.v / a.q : 0;
+  return acc;
+}
+function factor(prod, unit, aiFactor){
+  const n = normUnit(unit), s = STD[n];
+  if (!prod) return s ? s[1] : 1;
+  if (s && s[0] === prod.unite) return s[1];
+  if (prod.conversions && prod.conversions[n] > 0) return prod.conversions[n];
+  if (aiFactor > 0) return aiFactor;
+  if (s) return s[1];
+  return 1;
+}
+function coutRecette(r, prix){
+  prix = prix || prixProduits();
+  let total = 0, manquants = [];
+  const lignes = (r.ingredients||[]).map(ing => {
+    const p = S.produits[ing.produitId];
+    const qb = (+ing.qte||0) * factor(p, ing.unite);
+    const pu = prix[ing.produitId]?.pm || 0;
+    if (!pu) manquants.push(p?.nom || "?");
+    const c = qb * pu; total += c;
+    return { ...ing, qteBase: qb, pu, cout: c };
+  });
+  const portions = Math.max(1, +r.portions||1);
+  const cout = total / portions;
+  const pvHT = (+r.prixVenteTTC||0) / (1+TVA_RESTO);
+  return { lignes, cout, pvHT, marge: pvHT - cout, foodCost: pvHT ? cout / pvHT : NaN, manquants, portions };
+}
+
+/* ============ derived: period / sales / consumption ============ */
+const PERIODES = [["7","7 j"],["30","30 j"],["mois","Mois"],["trimestre","Trimestre"],["annee","Année"],["tout","Tout"]];
+function periodRange(){
+  const end = iso(TODAY), d = new Date(TODAY), y = d.getFullYear(), m = d.getMonth();
+  if (UI.period === "7") return [addDays(end,-6), end, "7 derniers jours"];
+  if (UI.period === "30") return [addDays(end,-29), end, "30 derniers jours"];
+  if (UI.period === "mois") return [iso(new Date(y, m, 1)), iso(new Date(y, m + 1, 0)), `Mois de ${MOIS_LONG[m]} ${y}`];
+  if (UI.period === "trimestre") { const q = Math.floor(m / 3); return [iso(new Date(y, q*3, 1)), iso(new Date(y, q*3 + 3, 0)), `${q+1}${q ? "e" : "er"} trimestre ${y} (${MOIS_LONG[q*3]} à ${MOIS_LONG[q*3+2]})`]; }
+  if (UI.period === "annee") return [`${y}-01-01`, `${y}-12-31`, `Année ${y}`];
+  return ["0000-01-01", "9999-12-31", "Tout l'historique"];
+}
+const MOIS_LONG = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const inRange = (d, [a,b]) => d >= a && d <= b;
+function ventesLignes(range){
+  const out = [];
+  for (const v of Object.values(S.ventes)) if (!range || inRange(v.date, range)) for (const l of (v.lignes||[])) out.push({ ...l, date: v.date });
+  return out;
+}
+function consoTheorique(range){
+  const res = {}; // pid -> qteBase
+  const sansFiche = {};
+  for (const l of ventesLignes(range)) {
+    const r = l.recetteId && S.recettes[l.recetteId];
+    if (!r) { sansFiche[l.plat] = (sansFiche[l.plat]||0) + (+l.qte||0); continue; }
+    const portions = Math.max(1, +r.portions||1);
+    for (const ing of (r.ingredients||[])) {
+      const p = S.produits[ing.produitId];
+      res[ing.produitId] = (res[ing.produitId]||0) + (+l.qte||0) * (+ing.qte||0) * factor(p, ing.unite) / portions;
+    }
+  }
+  return { res, sansFiche };
+}
+function entreesPeriode(range){
+  const res = {}; let valeur = 0, nb = 0;
+  for (const e of Object.values(S.entrees)) if (inRange(e.date||"", range)) for (const l of (e.lignes||[])) {
+    const a = res[l.produitId] ||= { q:0, v:0 }; a.q += +l.qteBase||0; a.v += +l.montant||0; valeur += +l.montant||0; nb++;
+  }
+  return { res, valeur, nb };
+}
+function weeksList(n = 6){
+  // semaines calées sur la date des documents (tickets de caisse, factures), jamais sur la date d'import
+  const today = iso(TODAY);
+  const dates = [...Object.values(S.ventes).map(v => v.date), ...Object.values(S.factures).filter(f => f.statut !== "doublon").map(f => f.date)]
+    .filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d||"") && d <= today).sort();
+  const last = dates.length ? dates[dates.length-1] : today;
+  const ws = weekStart(last), out = [];
+  for (let i = n-1; i >= 0; i--) out.push(addDays(ws, -7*i));
+  return out;
+}
+function atypiques(){
+  const R = rules(), weeks = weeksList(6);
+  const perWeek = weeks.map(w => consoTheorique([w, addDays(w,6)]).res);
+  const pids = new Set(perWeek.flatMap(o => Object.keys(o)));
+  const lastIdx = weeks.length - 1;
+  const out = [];
+  for (const pid of pids) {
+    const serie = perWeek.map(o => o[pid] || 0);
+    const hist = serie.slice(0, lastIdx).filter(x => x > 0);
+    if (hist.length < 2) continue;
+    const moy = hist.reduce((a,b)=>a+b,0) / hist.length;
+    const cur = serie[lastIdx];
+    const ecart = moy ? (cur - moy) / moy : 0;
+    if (Math.abs(ecart) >= R.seuilConso) out.push({ pid, nom: S.produits[pid]?.nom || pid, unite: S.produits[pid]?.unite || "", serie, moy, cur, ecart, semaine: weeks[lastIdx] });
+  }
+  return { list: out.sort((a,b) => Math.abs(b.ecart) - Math.abs(a.ecart)), weeks };
+}
+
+/* ============ render plumbing ============ */
+let rq = false;
+function scheduleRender(){ if (rq) return; rq = true; requestAnimationFrame(() => { rq = false; render(); }); }
+function renderTabs(){
+  if (!TABS.some(t => t.id === UI.tab && tabAllowed(t))) UI.tab = (TABS.find(tabAllowed) || {}).id || "none";
+  $("#tabs").innerHTML = TABS.filter(tabAllowed).map(t => `<button role="tab" id="tab-${t.id}" aria-selected="${UI.tab===t.id}" data-tab="${t.id}">${t.label}${t.cnt ? `<span class="cnt">${t.cnt()}</span>` : ""}</button>`).join("");
+}
+function render(){
+  renderTabs();
+  const m = $("#main");
+  // keep the recipe editor intact while the chef is typing
+  if (UI.tab === "fiches" && UI.editRecette && $("#recette-form")) { refreshRecetteCalc(); renderFichesList(); return; }
+  const y = window.scrollY;
+  m.innerHTML = UI.tab === "none" ? statusBanner() : ({ acces: vAcces, dash: vDash, factures: vFactures, stock: vStock, fiches: vFiches, ventes: vVentes, conso: vConso }[UI.tab] || vDash)();
+  if (UI.tab === "fiches") { renderFichesList(); if (UI.editRecette) mountRecetteEditor(); }
+  if (UI.tab === "dash") mountCharts();
+  window.scrollTo(0, y);
+}
+function demoCount(){ return COLS.reduce((a,c)=>a+Object.values(S[c]).filter(d=>d.demo).length,0); }
+function statusBanner(){
+  const n = demoCount();
+  const r = currentRole();
+  const roleB = r === "proprietaire" ? "" : r === "chargement" ? `<div class="banner info">Vérification de votre accès…</div>` : `<div class="banner ${r === "attente" ? "warn" : "info"}"><b>${ROLES[r].label}</b> · ${ROLES[r].desc}.${r === "attente" ? " Le propriétaire de l'agent doit vous attribuer un rôle." : ""}</div>`;
+  if (r !== "proprietaire") return roleB;
+  if (n) return `<div class="banner warn row between"><span>Données d'exemple chargées (fournisseurs, factures et ventes fictifs) pour montrer le fonctionnement.</span>${UI.confirmDemo ? `<span class="confirm">Effacer ${n} éléments d'exemple ? <button class="btn danger sm" data-demo-yes>Effacer</button><button class="btn ghost sm" data-demo-no>Annuler</button></span>` : `<button class="btn sm" data-demo-clear>Effacer les données d'exemple</button>`}</div>`;
+  if (liveDb) return "";
+  return `<div class="banner info">Mode local : les données ne sont pas enregistrées sur le serveur dans cette vue.</div>`;
+}
+function periodSeg(){
+  return `<div class="seg" role="group" aria-label="Période">${PERIODES.map(([k,l]) => `<button data-period="${k}" aria-pressed="${UI.period===k}">${l}</button>`).join("")}</div>`;
+}
+
+/* ============ VIEW: dashboard ============ */
+function vDash(){
+  const range = periodRange(), prix = prixProduits();
+  const fact = Object.values(S.factures).filter(f => f.statut !== "doublon" && inRange(f.date||"", range));
+  const achats = fact.reduce((a,f) => a + (+f.totalHT || (f.lignes||[]).reduce((s,l)=>s+(+l.total||0),0)), 0);
+  const ent = entreesPeriode(range);
+  const vl = ventesLignes(range);
+  const ca = vl.reduce((a,l)=>a+(+l.ca||0),0), caHT = ca/(1+TVA_RESTO);
+  const nbPlats = vl.reduce((a,l)=>a+(+l.qte||0),0);
+  const { res: conso, sansFiche } = consoTheorique(range);
+  const coutConso = Object.entries(conso).reduce((a,[pid,q]) => a + q*(prix[pid]?.pm||0), 0);
+  const fc = caHT ? coutConso / caHT : NaN;
+  const aty = atypiques();
+  const alertesFact = Object.values(S.factures).filter(f => (f.alertes||[]).length && inRange(f.date||"", range));
+  const topConso = Object.entries(conso).map(([pid,q]) => ({ pid, nom:S.produits[pid]?.nom||pid, q, u:S.produits[pid]?.unite||"", v:q*(prix[pid]?.pm||0) }))
+    .sort((a,b)=>b.v-a.v).slice(0,8);
+  const maxV = Math.max(1, ...topConso.map(x=>x.v));
+  const atySet = new Set(aty.list.map(a=>a.pid));
+  const recettes = Object.values(S.recettes).map(r => ({ r, c: coutRecette(r, prix), vendus: vl.filter(l=>l.recetteId===r.id).reduce((a,l)=>a+(+l.qte||0),0) }))
+    .sort((a,b)=>b.vendus-a.vendus);
+  const empty = !Object.keys(S.factures).length && !Object.keys(S.ventes).length;
+
+  return `${statusBanner()}
+  <div class="row between"><div><h2>Tableau de bord</h2><div class="muted small">${range[2]} · selon la date des documents (facture, ticket de caisse), pas la date d'import · stock théorique, sans inventaire physique (V2)</div></div>${periodSeg()}</div>
+  ${empty ? `<div class="empty">Aucune donnée pour l'instant. Déposez une facture dans l'onglet <b>Factures</b> et importez l'export de caisse dans <b>Ventes / caisse</b>.</div>` : ""}
+  <section class="kpis" aria-label="Indicateurs">
+    <div class="kpi"><span class="l">Achats HT</span><span class="v">${eur(achats,0)}</span><span class="d">${fact.length} facture${fact.length>1?"s":""}</span></div>
+    <div class="kpi"><span class="l">Entrées de stock</span><span class="v">${eur(ent.valeur,0)}</span><span class="d">${ent.nb} lignes produits</span></div>
+    <div class="kpi"><span class="l">Plats vendus</span><span class="v">${nf(nbPlats,0)}</span><span class="d">tickets de caisse</span></div>
+    <div class="kpi"><span class="l">Chiffre d'affaires</span><span class="v">${eur(ca,0)}</span><span class="d">TTC · ${eur(caHT,0)} HT</span></div>
+    <div class="kpi"><span class="l">Coût matière théorique</span><span class="v">${eur(coutConso,0)}</span><span class="d">marge ${eur(caHT-coutConso,0)}</span></div>
+    <div class="kpi hl"><span class="l">Food cost théorique</span><span class="v">${pct(fc)}</span><span class="d">coût matière / CA HT</span></div>
+  </section>
+
+  <div class="grid2">
+    <section class="panel">
+      <header><div><h3>Ventes et achats par ${({jour:"jour",semaine:"semaine",mois:"mois"})[chartGrain()]}</h3><p>CA HT des tickets de caisse et achats HT des factures, à la date du document · ${range[2].toLowerCase()}</p></div>
+</header>
+      <div class="legend"><span><i style="background:var(--s-ca)"></i>CA HT</span><span><i style="background:var(--s-achat)"></i>Achats HT</span></div>
+      <div class="chart" id="ch-week"></div>
+    </section>
+    <section class="panel">
+      <header><div><h3>Consommation théorique</h3><p>Valeur consommée par produit selon ventes × fiches techniques</p></div><span class="role sys">Système</span></header>
+      ${topConso.length ? topConso.map(x => `<div class="hbar"><span>${esc(x.nom)}</span><div class="track" title="${nf(x.q)} ${esc(x.u)}"><div class="fill ${atySet.has(x.pid)?"atyp":""}" style="width:${(x.v/maxV*100).toFixed(1)}%"></div></div><span class="num r">${eur(x.v,0)}</span></div>`).join("")
+        : `<div class="empty">Pas encore de ventes reliées à une fiche technique.</div>`}
+      ${Object.keys(sansFiche).length ? `<p class="small muted" style="margin:10px 0 0">Plats vendus sans fiche technique : ${Object.entries(sansFiche).map(([p,q])=>`${esc(p)} (${nf(q,0)})`).join(", ")}</p>` : ""}
+    </section>
+  </div>
+
+  <div class="grid2">
+    <section class="panel">
+      <header><div><h3>Consommations atypiques</h3><p>Semaine du ${fdate(aty.weeks[aty.weeks.length-1])} comparée à la moyenne des semaines précédentes (seuil ±${Math.round(rules().seuilConso*100)} %)</p></div><div class="roles"><span class="role sys">Détection</span><span class="role ia">Explication</span></div></header>
+      ${atyTable(aty)}
+      ${analyseBlock("conso-" + aty.weeks[aty.weeks.length-1], aty.list.length)}
+    </section>
+    <section class="panel">
+      <header><div><h3>Alertes factures</h3><p>Doublons, incohérences de quantité ou de prix</p></div><div class="roles"><span class="role sys">Signale</span><span class="role ia">Analyse</span></div></header>
+      ${alertesFact.length ? `<div class="alerts">${alertesFact.slice(0,6).map(f => `<div class="alert">${statutPill(f)}<div><b>${esc(f.fournisseur||"?")}</b> <span class="muted">n° ${esc(f.numero||"—")} · ${fdate(f.date)}</span><br><span class="small">${(f.alertes||[]).map(a=>esc(a.message)).join(" · ")}</span></div></div>`).join("")}</div>
+        <p style="margin:10px 0 0"><button class="btn sm" data-goto="factures">Voir les factures</button></p>` : `<div class="empty">Aucune alerte sur la période.</div>`}
+    </section>
+  </div>
+
+  <section class="panel">
+    <header><div><h3>Coût matière, marge et food cost par plat</h3><p>Calculé à partir des fiches techniques et du prix d'achat moyen réel</p></div><span class="role sys">Système</span></header>
+    ${recettes.length ? `<div class="tw"><table><thead><tr><th>Plat</th><th class="r">Vendus</th><th class="r">Prix HT</th><th class="r">Coût matière</th><th class="r">Marge</th><th class="r">Food cost</th></tr></thead><tbody>
+      ${recettes.map(({r,c,vendus}) => `<tr><td>${esc(r.nom)}</td><td class="r">${nf(vendus,0)}</td><td class="r">${eur(c.pvHT)}</td><td class="r">${eur(c.cout)}</td><td class="r">${eur(c.marge)}</td><td class="r">${fcPill(c.foodCost)}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">Aucune fiche technique. Le chef les crée dans l'onglet Fiches techniques.</div>`}
+  </section>`;
+}
+function fcPill(fc){
+  if (!isFinite(fc)) return `<span class="pill info">—</span>`;
+  const cls = fc <= 0.30 ? "ok" : fc <= 0.38 ? "warn" : "crit";
+  return `<span class="pill ${cls}">${pct(fc)}</span>`;
+}
+function spark(serie, badLast){
+  const w = 84, h = 22, max = Math.max(...serie, 0.0001);
+  const pts = serie.map((v,i) => [2 + i*(w-4)/(serie.length-1||1), h-2 - (v/max)*(h-4)]);
+  const d = pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+  const L = pts[pts.length-1];
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><path d="${d}"/><circle cx="${L[0]}" cy="${L[1]}" r="3" class="${badLast?"bad":""}"/></svg>`;
+}
+function atyTable(aty){
+  if (!aty.list.length) return `<div class="empty">Aucune consommation atypique détectée.</div>`;
+  return `<div class="tw"><table><thead><tr><th>Produit</th><th>6 semaines</th><th class="r">Semaine</th><th class="r">Moyenne</th><th class="r">Écart</th></tr></thead><tbody>
+  ${aty.list.map(a => `<tr><td>${esc(a.nom)}</td><td>${spark(a.serie, true)}</td><td class="r">${nf(a.cur)} ${esc(a.unite)}</td><td class="r">${nf(a.moy)} ${esc(a.unite)}</td><td class="r"><span class="pill ${Math.abs(a.ecart)>=0.6?"crit":"warn"}">${a.ecart>0?"+":""}${pct(a.ecart,0)}</span></td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function analyseBlock(key, n){
+  const a = S.analyses[key];
+  const busy = UI.anaBusy[key];
+  if (!n) return "";
+  return `<div style="margin-top:12px;display:grid;gap:8px">
+    ${a ? `<div class="ai-box"><span class="h">Analyse de l'agent IA · ${new Date(a.createdAt).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}</span>${esc(a.texte)}</div>` : ""}
+    ${busy ? `<div class="ai-box" id="ana-live-${esc(key)}"><span class="h">Agent IA</span>${esc(busy === true ? "Analyse en cours…" : busy)}</div>` : ""}
+    ${sample && can("analyser") ? `<div><button class="btn ia sm" data-analyse="${esc(key)}" ${busy?"disabled":""}>${a ? "Relancer l'analyse" : "Expliquer avec l'agent IA"}</button></div>` : `<p class="small muted">Agent IA indisponible dans cette vue.</p>`}
+  </div>`;
+}
+/* graphique ventes / achats : barres par date de document (jour, semaine ou mois) sur la période choisie */
+/* Découpage fixe par période : 7 j → jours (lundi, mardi…), 30 j → semaines du calendrier numérotées,
+   Mois → jours, Trimestre → Mois 1 à 3, Année → janvier à décembre, Tout → selon la durée. */
+function chartGrain(){
+  if (UI.period === "30") return "semaine";
+  if (UI.period === "trimestre" || UI.period === "annee") return "mois";
+  if (UI.period !== "tout") return "jour";
+  const [a, b] = chartRange(); const span = (new Date(b) - new Date(a)) / 864e5;
+  return span > 180 ? "mois" : span > 45 ? "semaine" : "jour";
+}
+function chartRange(){
+  const [a, b] = periodRange(), today = iso(TODAY);
+  if (UI.period !== "tout") return [a, b];
+  const docs = [...Object.values(S.ventes).map(v => v.date), ...Object.values(S.factures).filter(f => f.statut !== "doublon").map(f => f.date)].filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d||"")).sort();
+  const first = docs[0] && docs[0] < addDays(today, -13) ? docs[0] : addDays(today, -13);
+  const last = docs.length && docs[docs.length-1] > today ? docs[docs.length-1] : today;
+  return [first, last];
+}
+const bucketOf = (d, g) => g === "mois" ? d.slice(0, 7) + "-01" : g === "semaine" ? weekStart(d) : d;
+const MOIS = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+/* libellé sous la barre : 1 ou 2 lignes, selon la période */
+function axeLabel(k, g, i, n){
+  if (UI.period === "7" && g === "jour") return [cap(JOURS[new Date(k + "T12:00:00").getDay()]), fdate(k).slice(0,5)];
+  if (UI.period === "30" && g === "semaine") return [`Semaine ${i+1}`, `${fdate(k).slice(0,5)}–${fdate(addDays(k,6)).slice(0,5)}`];
+  if (UI.period === "trimestre" && g === "mois") return [`Mois ${i+1}`, cap(MOIS_LONG[+k.slice(5,7)-1])];
+  if (UI.period === "annee" && g === "mois") return [cap(MOIS_LONG[+k.slice(5,7)-1])];
+  return [bucketLabel(k, g)];
+}
+function bucketLabel(k, g, long){
+  if (g === "mois") return long ? cap(MOIS_LONG[+k.slice(5,7)-1]) + " " + k.slice(0,4) : MOIS[+k.slice(5,7)-1];
+  if (g === "semaine") return (long ? "Semaine du " : "") + (long ? fdate(k) : fdate(k).slice(0,5));
+  if (!long) return fdate(k).slice(0,5);
+  return new Date(k + "T12:00:00").toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+}
+function mountCharts(){
+  const el = $("#ch-week"); if (!el) return;
+  const g = chartGrain(), [a, b] = chartRange();
+  const keys = [];
+  for (let d = a; d <= b; d = addDays(d, 1)) { const k = bucketOf(d, g); if (keys[keys.length-1] !== k) keys.push(k); }
+  const idx = Object.fromEntries(keys.map((k, i) => [k, i]));
+  const data = keys.map(k => ({ k, ca: 0, ach: 0, nf: 0, nv: 0 }));
+  for (const v of Object.values(S.ventes)) { if (!inRange(v.date||"", [a, b])) continue; const o = data[idx[bucketOf(v.date, g)]]; if (!o) continue; o.ca += (v.lignes||[]).reduce((s,l)=>s+(+l.ca||0),0)/(1+TVA_RESTO); o.nv++; }
+  for (const f of Object.values(S.factures)) { if (f.statut === "doublon" || !inRange(f.date||"", [a, b])) continue; const o = data[idx[bucketOf(f.date, g)]]; if (!o) continue; o.ach += +f.totalHT || (f.lignes||[]).reduce((s,l)=>s+(+l.total||0),0); o.nf++; }
+  const hasCA = data.some(d => d.ca > 0), hasAch = data.some(d => d.ach > 0), both = hasCA && hasAch;
+  const n = data.length;
+  const labels = data.map((d, i) => axeLabel(d.k, g, i, n));
+  const deux = labels.some(l => l.length > 1);
+  const larg = Math.max(...labels.map(l => Math.max(...l.map(x => x.length)))) * 6.6 + 8;   // place nécessaire par libellé
+  const W = Math.max(520, Math.min(1200, n <= 14 ? n * larg + 54 : n * 18)), H = deux ? 244 : 230, pl = 46, pr = 8, pt = 18, pb = deux ? 40 : 26;
+  const max = Math.max(100, ...data.flatMap(d=>[d.ca,d.ach]));
+  const step = niceStep(max/4), top = Math.ceil(max/step)*step;
+  const y = v => pt + (H-pt-pb) * (1 - v/top);
+  const gw = (W-pl-pr)/n, bw = Math.max(2, Math.min(both ? 22 : 34, (gw - (n > 20 ? 3 : 10)) / (both ? 2 : 1)));
+  const every = n <= 14 ? 1 : Math.ceil(n / 10), showVals = data.filter(d => d.ca > 0 || d.ach > 0).length <= 16;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="CA HT et achats HT par ${g} de document">`;
+  for (let v = 0; v <= top+0.1; v += step) s += `<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}"/><text x="${pl-6}" y="${y(v)+3.5}" text-anchor="end">${v>=1000?nf(v/1000,1)+"k":nf(v,0)}</text>`;
+  const bar = (x, v, col) => { const h = Math.max(0, y(0)-y(v)); if (h <= 0) return ""; const r = Math.min(4, h/2, bw/2), yy = y(v);
+    return `<path d="M${x} ${y(0)} V${yy+r} Q${x} ${yy} ${x+r} ${yy} H${x+bw-r} Q${x+bw} ${yy} ${x+bw} ${yy+r} V${y(0)} Z" fill="${col}"/>`; };
+  data.forEach((d,i) => {
+    const cx = pl + gw*i + gw/2;
+    const xCa = both ? cx - bw - 1 : cx - bw/2, xAch = both ? cx + 1 : cx - bw/2;
+    s += bar(xCa, d.ca, "var(--s-ca)") + bar(xAch, d.ach, "var(--s-achat)");
+    if (showVals && d.ach > 0) s += `<text x="${xAch + bw/2}" y="${y(d.ach) - 4}" text-anchor="middle" class="val">${nf(d.ach,0)}</text>`;
+    if (showVals && d.ca > 0) s += `<text x="${xCa + bw/2}" y="${y(d.ca) - 4}" text-anchor="middle" class="val">${nf(d.ca,0)}</text>`;
+    if (i % every === 0) s += `<text x="${cx}" y="${H - pb + 15}" text-anchor="middle">${labels[i].map((l, j) => `<tspan x="${cx}" dy="${j ? 13 : 0}"${j ? ' class="sub"' : ""}>${esc(l)}</tspan>`).join("")}</text>`;
+    s += `<rect x="${pl+gw*i}" y="${pt}" width="${gw}" height="${H-pt-pb}" fill="transparent" data-i="${i}"/>`;
+  });
+  s += `<line class="axis" x1="${pl}" x2="${W-pr}" y1="${y(0)}" y2="${y(0)}"/></svg><div class="tip"></div>`;
+  el.innerHTML = s;
+  const tip = $(".tip", el);
+  el.querySelectorAll("rect[data-i]").forEach(r => {
+    r.addEventListener("mouseenter", () => { const d = data[+r.dataset.i];
+      const ttl = UI.period === "30" && g === "semaine" ? `Semaine ${+r.dataset.i + 1} : du ${fdate(d.k)} au ${fdate(addDays(d.k, 6))}` : UI.period === "trimestre" && g === "mois" ? `Mois ${+r.dataset.i + 1} : ${bucketLabel(d.k, g, true)}` : bucketLabel(d.k, g, true);
+      tip.innerHTML = `${esc(ttl)}<br>Achats HT ${eur(d.ach)}${d.nf ? ` (${d.nf} facture${d.nf>1?"s":""})` : ""}<br>CA HT ${eur(d.ca)}`; tip.style.opacity = 1;
+      const bb = r.getBoundingClientRect(), eb = el.getBoundingClientRect(); tip.style.left = Math.min(eb.width - 90, Math.max(90, bb.left - eb.left + bb.width/2)) + "px"; tip.style.top = "40px"; r.setAttribute("fill","color-mix(in srgb, var(--ink) 5%, transparent)"); });
+    r.addEventListener("mouseleave", () => { tip.style.opacity = 0; r.setAttribute("fill","transparent"); });
+  });
+}
+function niceStep(x){ const p = Math.pow(10, Math.floor(Math.log10(x||1))); const n = x/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+
+/* ============ VIEW: factures ============ */
+function statutPill(f){
+  if (f.statut === "doublon") return `<span class="pill crit">Doublon</span>`;
+  if (f.statut === "erreur") return `<span class="pill crit">Erreur</span>`;
+  if (f.statut === "a_lire") return f.erreurLecture ? `<span class="pill crit" title="${esc(f.erreurLecture)}">Lecture IA en échec</span>` : `<span class="pill ia">Lecture IA en attente</span>`;
+  if ((f.alertes||[]).some(a=>a.niveau==="crit")) return `<span class="pill crit">Alerte</span>`;
+  if ((f.alertes||[]).length) return `<span class="pill warn">À surveiller</span>`;
+  if (!(f.lignes||[]).length && (f.autres||[]).length) return `<span class="pill info">Hors stock</span>`;
+  return `<span class="pill ok">Intégrée</span>`;
+}
+function vFactures(){
+  const list = Object.values(S.factures).sort((a,b) => (b.date||"").localeCompare(a.date||"") || (b.importedAt||"").localeCompare(a.importedAt||""));
+  return `${statusBanner()}
+  <section class="panel">
+    <header><div><h2>Factures fournisseurs</h2><p>Déposez une ou plusieurs factures : l'import, l'extraction, les contrôles et les entrées de stock s'enchaînent automatiquement.</p></div>
+      <div class="roles"><span class="role chef">Dépôt</span><span class="role sys">Import · hash · contrôles</span><span class="role ia">Lecture</span></div></header>
+    ${sample && can("deposer") ? `<label class="drop" id="drop" for="file-in">
+      <strong>Déposer une ou plusieurs factures ici</strong>
+      <span class="muted small">${sampleLimits && !sampleLimits.images ? "PDF numériques des fournisseurs · les photos et scans ne sont pas lisibles dans cette vue" : "Photos (JPG, PNG, WebP) ou PDF"} · import en masse accepté</span>
+      <span class="btn primary sm">Choisir des fichiers</span>
+      <span class="muted small">Sélection multiple (Maj ou Cmd/Ctrl + clic), glisser-déposer d'un lot, ou une archive <b>ZIP</b> de centaines de PDF · gardez la page ouverte pendant l'import</span>
+    </label>
+    <input type="file" id="file-in" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,.pdf,.zip,application/zip,application/x-zip-compressed" hidden>`
+    : `<div class="banner warn">L'agent IA n'est pas disponible dans cette vue : la lecture automatique des factures est désactivée.</div>`}
+    ${sample && can("deposer") ? reglagesHtml() : ""}
+    <div class="queue" id="queue">${queueHtml()}</div>
+  </section>
+
+  <section class="panel">
+    <header><div><h3>Factures importées</h3><p>${list.length} document${list.length>1?"s":""} · cliquez sur une ligne pour le détail</p></div></header>
+    ${list.length ? `<div class="tw"><table><thead><tr><th>Statut</th><th>Fournisseur</th><th>N°</th><th>Date facture</th><th class="r">Lignes</th><th class="r">Total HT</th><th>Importée le</th></tr></thead><tbody>
+      ${list.map(f => `<tr class="click ${UI.openFacture===f.id?"open":""}" data-fac="${f.id}" tabindex="0"><td>${statutPill(f)}</td><td>${esc(f.fournisseur || (f.statut === "a_lire" ? f.fichier?.nom : "") || "—")}</td><td class="mono small">${esc(f.numero||"—")}</td><td>${fdate(f.date)}${f.dateProvisoire?` <span class="pill warn" title="Date de facture non lue : date d'import utilisée">à vérifier</span>`:""}</td><td class="r">${(f.lignes||[]).length}</td><td class="r">${f.totalHT!=null?eur(+f.totalHT):"—"}</td><td class="small muted">${f.importedAt?new Date(f.importedAt).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"}):"—"}</td></tr>
+      ${UI.openFacture===f.id ? `<tr class="open"><td colspan="7">${factureDetail(f)}</td></tr>` : ""}`).join("")}
+    </tbody></table></div>` : `<div class="empty">Aucune facture importée.</div>`}
+  </section>`;
+}
+function qItem(q){
+  const steps = [["import","Import"],["hash","Doublons"],["stock","Stockage"],["texte","Texte"],["ia","Lecture IA"],["ctrl","Contrôles"],["entree","Entrées stock"],["ana","Analyse IA"]];
+  return `<div class="qitem"><div><b>${esc(q.name)}</b>${q.source ? ` <span class="small muted">· ${esc(q.source)}</span>` : ""} <span class="muted small">${esc(q.msg||"")}</span></div><div>${q.state==="done"?`<span class="pill ok">Terminé</span>`:q.state==="err"?`<span class="pill crit">Échec</span>`:q.state==="dup"?`<span class="pill crit">Doublon</span>`:q.state==="wait"?`<span class="pill info">En attente</span>`:q.state==="lu_attente"?`<span class="pill info">Importée · IA en attente</span>`:`<span class="pill ia">En cours</span>`}</div>
+  <div class="steps">${steps.filter(([k])=>q.steps[k]).map(([k,l]) => `<span class="step ${q.steps[k]}">${l}</span>`).join("")}</div></div>`;
+}
+function queueHtml(){
+  const aLire = Object.values(S.factures).filter(f => f.statut === "a_lire");
+  const enFile = new Set(UI.queue.filter(q => q.fid && (q.state === "lu_attente" || q.state === "run")).map(q => q.fid));
+  const orphelines = aLire.filter(f => !enFile.has(f.id)).length;
+  const lancer = orphelines && sample && can("deposer") ? `<div class="banner info row between"><span><b>${orphelines} facture${orphelines>1?"s":""} importée${orphelines>1?"s":""}</b> en attente de lecture par l'agent IA.</span><button class="btn primary sm" data-lancer-ia>Lancer la lecture IA</button></div>` : "";
+  if (!UI.queue.length) return lancer;
+  const n = k => UI.queue.filter(q => q.state === k).length;
+  const total = UI.queue.length;
+  const imp = UI.queue.filter(q => q.phase !== "import" || ["dup","err"].includes(q.state)).length;       // import terminé (ou écarté)
+  const iaTot = UI.queue.filter(q => q.phase === "ia").length, iaFini = UI.queue.filter(q => q.phase === "ia" && ["done","dup","err"].includes(q.state)).length;
+  const iaRun = UI.queue.filter(q => q.phase === "ia" && q.state === "run").length, impRun = UI.queue.filter(q => q.phase === "import" && q.state === "run").length;
+  const err = n("err"), actifs = n("run") + n("wait") + n("lu_attente");
+  const pause = UI.pause && (n("lu_attente") || iaRun) ? `<div class="banner warn row between"><span>${UI.pause === "limite" ? "Lecture IA en pause : la limite d'utilisation de l'agent IA est atteinte. Reprenez dans quelques minutes (ou plus tard si votre quota est épuisé)." : UI.pause === "session" ? "Lecture IA en pause : reconnectez-vous à claude.ai puis reprenez." : "Lecture IA suspendue."} Les factures importées restent enregistrées « à lire ».</span><button class="btn primary sm" data-resume>Reprendre</button></div>` : "";
+  const barre = (v, t, col) => `<div style="height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;flex:1;min-width:80px"><div style="height:100%;width:${t ? (v/t*100).toFixed(1) : 0}%;background:${col}"></div></div>`;
+  const resume = lancer + pause + `<div class="row between small">
+    <span class="row" style="gap:8px;flex:1;min-width:220px"><b style="white-space:nowrap">Import ${imp}/${total}</b>${barre(imp, total, "var(--accent)")}${impRun ? `<span class="muted">${impRun} en cours</span>` : ""}</span>
+    <span class="row" style="gap:8px;flex:1;min-width:220px"><b style="white-space:nowrap">Lecture IA ${iaFini}/${iaTot}</b>${barre(iaFini, iaTot, "var(--ia)")}${iaRun ? `<span class="muted">${iaRun} en cours</span>` : ""}</span></div>
+    <div class="row between small"><span>${n("done")} intégrée${n("done")>1?"s":""}${n("dup")?` · ${n("dup")} doublon${n("dup")>1?"s":""}`:""}${err?` · <span style="color:var(--crit)">${err} échec${err>1?"s":""}</span>`:""}</span>
+    <span class="row">${err && can("deposer") ? `<button class="btn sm" data-retry-err>Relancer les échecs</button>` : ""}${(n("lu_attente") || iaRun) && !UI.pause ? `<button class="btn ghost sm" data-suspend>Suspendre la lecture IA</button>` : ""}${!actifs ? `<button class="btn ghost sm" data-clear-queue>Vider la liste</button>` : ""}</span></div>`;
+  let liste = UI.queue, masques = "";
+  if (total > 40) {
+    const run = UI.queue.filter(q => q.state === "run"), echecs = UI.queue.filter(q => q.state === "err"),
+      wait = UI.queue.filter(q => q.state === "wait" || q.state === "lu_attente"), finis = UI.queue.filter(q => q.state === "done" || q.state === "dup");
+    liste = [...run, ...echecs, ...wait.slice(0, 5), ...finis.slice(0, 20)];
+    const cache = total - liste.length;
+    if (cache) masques = `<div class="small muted" style="text-align:center">${cache} autre${cache>1?"s":""} fichier${cache>1?"s":""} non affiché${cache>1?"s":""} (${Math.max(0, wait.length-5)} en attente, ${Math.max(0, finis.length-20)} terminés plus anciens)</div>`;
+  }
+  return resume + liste.map(qItem).join("") + masques;
+}
+function factureDetail(f){
+  const prix = prixProduits();
+  const doc = f.fichier || {};
+  const del = UI.confirmDel === f.id;
+  return `<div class="detail">
+    ${(f.alertes||[]).length ? `<div class="alerts">${f.alertes.map(a => `<div class="alert"><span class="pill ${a.niveau==="crit"?"crit":a.niveau==="warn"?"warn":"info"}">${esc(a.type)}</span><span>${esc(a.message)}</span></div>`).join("")}</div>` : ""}
+    ${f.analyseIA ? `<div class="ai-box"><span class="h">Analyse de l'agent IA</span>${esc(f.analyseIA)}</div>` : ""}
+    ${UI.anaBusy["fac-"+f.id] ? `<div class="ai-box"><span class="h">Agent IA</span>Analyse en cours…</div>` : ""}
+    <div class="tw"><table><thead><tr><th>Libellé facture</th><th>Produit référentiel</th><th class="r">Qté</th><th>Unité</th><th class="r">PU net</th><th class="r">Total HT</th><th class="r">Entrée stock</th><th class="r">Prix / unité stock</th></tr></thead><tbody>
+    ${(f.lignes||[]).map(l => { const p = S.produits[l.produitId]; return `<tr><td>${esc(l.libelle)}</td><td>${esc(p?.nom||"—")}</td><td class="r">${nf(l.qte,3)}</td><td>${esc(l.unite||"")}</td><td class="r">${eur(+l.pu)}</td><td class="r">${eur(+l.total)}${l.remise?`<br><span class="small muted">remise ${eur(+l.remise)}</span>`:""}</td><td class="r">${nf(l.qteBase,3)} ${esc(p?.unite||"")}</td><td class="r">${eur(+l.puBase)}</td></tr>`; }).join("")}
+    </tbody></table></div>
+    ${(f.autres||[]).length ? `<div class="small"><b>Hors stock</b> <span class="muted">(frais, consignes, non alimentaire : comptés dans les achats, pas dans le stock)</span><br>${f.autres.map(o => `<span class="pill info" style="margin:4px 4px 0 0">${esc({frais:"Frais",consigne:"Consigne",non_alimentaire:"Non alim."}[o.type]||"Autre")}</span>${esc(o.libelle)} <span class="mono">${eur(+o.total)}</span>${o.horsHT?' <span class="muted">(hors HT)</span>':''}`).join("<br>")}</div>` : ""}
+    <div class="row between">
+      <div class="small muted">Total HT ${f.totalHT!=null?eur(+f.totalHT):"—"} · TVA ${f.tva!=null?eur(+f.tva):"—"} · TTC ${f.totalTTC!=null?eur(+f.totalTTC):"—"} · ${doc.url ? `<a href="${esc(doc.url)}" target="_blank" rel="noopener">Document original (${esc(doc.nom||"fichier")})</a>` : doc.nom ? `Original : ${esc(doc.nom)} (${esc(doc.note || "non conservé")})` : "Pas de document original"} ${f.hash?`· <span class="mono" title="Empreinte SHA-256">#${esc(f.hash.slice(0,10))}</span>`:""}</div>
+      <div class="row">
+        ${sample && can("analyser") && (f.alertes||[]).length ? `<button class="btn ia sm" data-ana-fac="${f.id}" ${UI.anaBusy["fac-"+f.id]?"disabled":""}>${f.analyseIA?"Relancer l'analyse IA":"Analyser avec l'agent IA"}</button>` : ""}
+        ${can("deposer") ? `<label class="small row" style="gap:6px">Date du document <input type="date" data-fac-date="${f.id}" value="${esc(f.date||"")}" style="width:auto"></label>` : ""}
+        ${can("doublons") && f.statut==="doublon" ? `<button class="btn sm" data-force="${f.id}">Intégrer quand même</button>` : ""}
+        ${!can("supprimer") ? "" : del ? `<span class="confirm">Supprimer la facture et ses entrées ? <button class="btn danger sm" data-del-yes="${f.id}">Supprimer</button><button class="btn ghost sm" data-del-no>Annuler</button></span>` : `<button class="btn ghost danger sm" data-del="${f.id}">Supprimer</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============ invoice pipeline ============ */
+async function sha256(buf){ const h = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join(""); }
+function loadScript(src){ return new Promise((ok, ko) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => ko(new Error("Chargement impossible : " + src)); document.head.appendChild(s); }); }
+let pdfReady = null;
+function ensurePdf(){
+  if (!pdfReady) pdfReady = (async () => {
+    const base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+    await loadScript(base + "pdf.min.js");
+    await loadScript(base + "pdf.worker.min.js");
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
+    return window.pdfjsLib;
+  })();
+  return pdfReady;
+}
+/* --- préparation des pages : rendu haute définition, redressement, découpage en bandes --- */
+/* Une page = son texte (lu tout de suite) + son image, dessinée seulement si l'agent en a besoin.
+   Rendu en mode « impression » : il ne dépend pas de l'affichage à l'écran, donc l'import continue
+   quand l'onglet est en arrière-plan ou la page cachée (le mode écran s'y bloquait indéfiniment). */
+const delai = (p, ms, msg) => Promise.race([p, new Promise((_, ko) => setTimeout(() => ko({ code: "timeout", message: msg }), ms))]);
+async function pdfPages(buf, maxPages){
+  const lib = await ensurePdf();
+  const pdf = await delai(lib.getDocument({ data: new Uint8Array(buf) }).promise, 60000, "ouverture du PDF trop longue");
+  const out = [];
+  for (let i = 1; i <= Math.min(pdf.numPages, maxPages); i++) {
+    const page = await pdf.getPage(i);
+    const vp0 = page.getViewport({ scale: 1 });
+    let text = "";
+    try { text = pageText(await delai(page.getTextContent(), 30000, "texte"), vp0); } catch (_) {}
+    let rendu = null;
+    out.push({ pdfText: text, canvas: () => rendu ||= (async () => {
+      const vp = page.getViewport({ scale: Math.min(3, 2600 / Math.max(vp0.width, vp0.height)) });
+      const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+      const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0,0,c.width,c.height);
+      const task = page.render({ canvasContext: ctx, viewport: vp, intent: "print" });
+      try { await delai(task.promise, 45000, "rendu de la page trop long"); } catch (e) { try { task.cancel(); } catch(_) {} rendu = null; throw e; }
+      return c;
+    })() });
+  }
+  out.destroy = () => { try { pdf.destroy(); } catch(_) {} };
+  return out;
+}
+/* Couche texte d'un PDF numérique (factures envoyées par email, espace client…) :
+   lignes reconstruites par position, colonnes conservées, filigranes inclinés ignorés. */
+function pageText(tc, vp0){
+  const items = (tc.items || []).filter(it => it.str && it.str.trim() && Math.abs(it.transform[1]) < 0.01 && Math.abs(it.transform[2]) < 0.01);
+  if (!items.length) return "";
+  const rows = [];
+  for (const it of items) {
+    const y = vp0.height - it.transform[5], x = it.transform[4], h = Math.abs(it.transform[3]) || 8;
+    let r = rows.find(r => Math.abs(r.y - y) < Math.max(2, h * 0.45));
+    if (!r) { r = { y, h, items: [] }; rows.push(r); }
+    r.items.push({ x, w: it.width || 0, s: it.str });
+  }
+  rows.sort((a, b) => a.y - b.y);
+  const cw = 4.2; // largeur moyenne d'un caractère (pt) pour reproduire les colonnes
+  return rows.map(r => {
+    r.items.sort((a, b) => a.x - b.x);
+    let line = "";
+    for (const it of r.items) {
+      const col = Math.round(it.x / cw);
+      line += line.length < col ? " ".repeat(col - line.length) : (line && !line.endsWith(" ") ? " " : "");
+      line += it.s;
+    }
+    return line.replace(/\s+$/, "");
+  }).join("\n");
+}
+async function imageToCanvas(file){
+  const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const k = Math.min(1, 2600 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas"); c.width = Math.round(bmp.width*k); c.height = Math.round(bmp.height*k);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  return c;
+}
+const toBlob = (c, q=0.9) => new Promise(r => c.toBlob(r, "image/jpeg", q));
+function scaled(c, max){ const k = Math.min(1, max / Math.max(c.width, c.height)); const o = document.createElement("canvas"); o.width = Math.round(c.width*k); o.height = Math.round(c.height*k); o.getContext("2d").drawImage(c, 0, 0, o.width, o.height); return o; }
+function rotate(c, deg){
+  deg = ((+deg||0) % 360 + 360) % 360; if (!deg) return c;
+  const o = document.createElement("canvas"); const swap = deg === 90 || deg === 270;
+  o.width = swap ? c.height : c.width; o.height = swap ? c.width : c.height;
+  const x = o.getContext("2d"); x.translate(o.width/2, o.height/2); x.rotate(deg*Math.PI/180); x.drawImage(c, -c.width/2, -c.height/2);
+  return o;
+}
+function bands(c, n){
+  // bandes horizontales avec chevauchement, pour garder un texte lisible après réduction à ~1,2 Mpx
+  if (n <= 1) return [c];
+  const ov = Math.round(c.height * 0.05), h = Math.ceil(c.height / n), out = [];
+  for (let i = 0; i < n; i++) {
+    const y0 = Math.max(0, i*h - ov), y1 = Math.min(c.height, (i+1)*h + ov);
+    const o = document.createElement("canvas"); o.width = c.width; o.height = y1 - y0;
+    o.getContext("2d").drawImage(c, 0, y0, c.width, o.height, 0, 0, c.width, o.height);
+    out.push(o);
+  }
+  return out;
+}
+async function orientation(c){
+  const small = await toBlob(scaled(c, 900), 0.8);
+  try {
+    const r = await sample.json(`Cette image est une page de facture scannée ou photographiée. De combien de degrés faut-il la faire pivoter dans le sens des aiguilles d'une montre pour que le texte se lise normalement ? Indique aussi si la page contient des lignes d'articles ou des totaux.
+Réponds uniquement en JSON : {"rotation": 0 | 90 | 180 | 270, "contenu": "articles" | "totaux" | "articles_et_totaux" | "rien"}`, { images: small, modelTier: "quick" });
+    return { rotation: [0,90,180,270].includes(+r?.rotation) ? +r.rotation : 0, contenu: r?.contenu || "articles" };
+  } catch(e) { if (e && e.code === "not_granted") throw e; return { rotation: 0, contenu: "articles" }; }
+}
+
+const REGLES_LECTURE = `Règles de lecture (factures de grossistes et fournisseurs de restauration en France : Metro, Promocash, Transgourmet, Essentiel RHF, brasseurs/distributeurs de boissons, primeurs, bouchers…) :
+- "fournisseur" : le VENDEUR (en-tête, logo, SIRET du vendeur), jamais le restaurant client ni l'adresse de livraison.
+- "numero" : numéro de facture tel qu'imprimé (ex. "FD-260818892", "0/0(064)0053/005999"). "date" : date de facture en YYYY-MM-DD (pas la date d'échéance ni de livraison).
+- Nombres : point décimal ("1 210,63" → 1210.63). Montants HT.
+- Une ligne par article. "qte" = nombre total d'unités achetées :
+  · colisage × quantité quand les deux sont donnés (Metro "1 18" → 18 ; "5 1" → 5) ;
+  · pour un article au poids (colonne poids, désignation "KG", quantité décimale), qte = le poids en kg et unite = "kg" même si la colonne unité indique "Unité" ;
+  · boissons : nombre de bouteilles/canettes (ex. "2 colis / 48" → 48), pas le nombre de colis.
+- "pu" = prix unitaire NET payé (après remise ligne, droits/accises inclus si le montant les inclut). Vérifie : qte × pu ≈ total.
+- "total" = montant HT de la ligne. Une promotion ou remise imprimée juste sous un article ("2.34-", "Offre Achetez plus…") se déduit du total de CET article (renseigne "remise": 2.34) ; ne crée pas de ligne séparée.
+- Ne mets PAS dans "lignes" (mets-les dans "autres" avec "type") :
+  · consignes, emballages, reprises de vides, palettes → type "consigne" et "horsHT": true si ces montants sont hors du total HT ;
+  · frais (port, énergie, indexation, frais administratifs "FA", livraison) → type "frais" ;
+  · produits non alimentaires (droguerie, hygiène, essuie-main, liquide vaisselle, bougies, décoration) → type "non_alimentaire".
+- Vérifie ta lecture : la somme des lignes (après remises) + frais + non-alimentaire doit retomber sur le total HT imprimé ; sinon relis les lignes.
+- Ignore les sous-totaux de rayon ("*** FROMAGE Total"), de bon de livraison ("Total BL-…") et les lignes d'en-tête de commande.
+- "produitId" : id du référentiel s'il s'agit du même produit (même article, format ou marque proches), sinon null.
+- Si produitId est null, "nouveauProduit" : {"nom": nom générique court en français avec la précision utile (ex. "Mozzarella di bufala", "Coca-Cola 33 cl", "Tomates cerises"), "unite": "kg" | "L" | "pc", "categorie": "Crèmerie" | "Fromagerie" | "Charcuterie" | "Boucherie" | "Poissonnerie" | "Fruits & légumes" | "Herbes" | "Épicerie" | "Boissons" | "Surgelés"}.
+  Unité de stock : kg pour ce qui se pèse (légumes, fromages, viandes, conserves en bocal, épices, pâtes) ; L pour huiles, sauces liquides, sirops, crème ; pc pour ce qui se compte (bouteilles et canettes de boisson, œufs, pièces, bottes, barquettes de germes).
+- Cohérence des unités (essentiel pour le prix de revient) : si "unite" vaut "kg" ou "L", "qte" est la quantité TOTALE en kg ou en L (2 sacs de farine 5 kg → qte 10, unite "kg", pu = prix au kg) et "facteurBase" vaut 1 ; sinon "qte" est un nombre d'articles et "facteurBase" la contenance d'UN article dans l'unité de stock du produit (mozzarella 150 g stockée en kg → 0.15 ; sac 5 kg → 5 ; bidon 10 L → 10). Contrôle final : total ÷ (qte × facteurBase) doit donner un prix réaliste par kg, L ou pièce (farine ≈ 1 à 2 €/kg, huile ≈ 2 €/L).
+- "facteurBase" : nombre d'unités de stock dans UNE unité de "qte". Ex. "BOCAL 3KG" compté en unités → 3 ; "2X500GRS" → 1 ; "100GRS" → 0.1 ; "OEUFS X90" → 90 ; "BQ 8X100G" burrata en pc → 8 ; bidon "5L" → 5 ; poids en kg → 1 ; bouteille comptée en pc → 1.`;
+
+function pagePrompt(ctx){
+  let prods = Object.values(S.produits).filter(p => !p.demo);
+  if (ctx.texte && prods.length > 60) {                       // PDF numérique : seulement les produits dont un mot apparaît sur la page
+    const page = " " + norm(ctx.texte) + " ";
+    prods = prods.filter(p => norm(p.nom).split(" ").some(w => w.length >= 4 && page.includes(" " + w.slice(0, 4))));
+  }
+  prods = prods.slice(0, 250).map(p => ({ id:p.id, nom:p.nom, unite:p.unite }));
+  return `Tu es l'agent IA de lecture de factures fournisseurs d'un restaurant.
+${ctx.multi ? `Voici la facture PDF numérique COMPLÈTE (${ctx.pages} page${ctx.pages>1?"s":""}) : le TEXTE EXACT de chaque page, extrait du PDF, colonnes reproduites par l'alignement des espaces. Lis toutes les pages et renvoie toutes les lignes de la facture en une seule réponse ; l'en-tête des colonnes et les mentions répétées en haut de chaque page ne sont pas des articles.
+--- TEXTE DE LA FACTURE ---
+${ctx.texte}
+--- FIN DU TEXTE ---` : ctx.texte ? `Voici la page ${ctx.page}/${ctx.pages} d'une facture PDF numérique : son TEXTE EXACT extrait du PDF (colonnes conservées) ci-dessous${ctx.nb ? ", et une image de la page pour la mise en page" : " (pas d'image jointe : les colonnes sont reproduites par l'alignement des espaces)"}. Fie-toi au texte pour les libellés, quantités et montants.
+--- TEXTE DE LA PAGE ---
+${ctx.texte}
+--- FIN DU TEXTE ---` : `Les images jointes sont ${ctx.nb > 1 ? `${ctx.nb} bandes horizontales successives (de haut en bas, avec un léger chevauchement) de` : ""} la page ${ctx.page}/${ctx.pages} d'une facture. Une ligne visible dans deux bandes (zone de chevauchement) ne compte qu'une fois.`}
+Deux lignes identiques qui se suivent sur la facture (même article, même montant, par exemple deux pièces pesées) sont deux achats distincts : garde-les toutes les deux. Ignore les filigranes (« Duplicata », « Copie »).
+${ctx.page > 1 && !ctx.multi ? `Pages précédentes déjà lues : fournisseur "${ctx.fournisseur || "?"}", numéro "${ctx.numero || "?"}", ${ctx.nLignes} lignes, dernière ligne "${ctx.dernier || ""}". Ne répète pas les lignes déjà lues.` : ""}
+
+Référentiel produits existant${ctx.texte ? " (produits déjà connus dont un mot figure sur cette page)" : ""} : ${JSON.stringify(prods)}
+${ctx.relance ? "\nATTENTION : ta réponse précédente était illisible ou coupée. Réponds uniquement par un JSON compact et valide, libellés courts, sans aucun texte autour.\n" : ""}
+
+${REGLES_LECTURE}
+
+Réponds uniquement avec ce JSON (champs d'en-tête et totaux à null s'ils ne figurent pas sur cette page) :
+{"fournisseur":null,"numero":null,"date":null,"totalHT":null,"tva":null,"totalTTC":null,
+ "lignes":[{"libelle":"","qte":0,"unite":"","pu":0,"total":0,"remise":0,"produitId":null,"nouveauProduit":null,"facteurBase":1}],
+ "autres":[{"libelle":"","type":"frais|consigne|non_alimentaire","total":0,"horsHT":false}],
+ "lisibilite":"bonne|moyenne|faible"}`;
+}
+async function lireFacture(src, q){
+  const isPdf = src.isPdf;
+  let canvases = src.pages;
+  // Certaines vues (application mobile, lien partagé…) ne peuvent pas envoyer d'images à l'agent :
+  // les PDF numériques sont alors lus sur leur seul texte, les scans/photos ne peuvent pas l'être.
+  if (!sampleLimits && sample) { try { sampleLimits = await sample.limits(); } catch(_) {} }
+  let canImg = !!sampleLimits?.images;
+  const maxImg = Math.max(1, Math.min(4, sampleLimits?.images?.maxCount || 1));
+  const ex = { fournisseur:null, numero:null, date:null, totalHT:null, tva:null, totalTTC:null, lignes:[], autres:[], lisibilite:"bonne" };
+  const lis = ["bonne","moyenne","faible"];
+  const fusion = r => {
+    if (!r) return;
+    for (const k of ["fournisseur","numero"]) if (!ex[k] && r[k]) ex[k] = r[k];
+    if (!ex.date && r.date) ex.date = parseDate(r.date);
+    for (const k of ["totalHT","tva","totalTTC"]) if (r[k] != null && r[k] !== "") ex[k] = +r[k];
+    if (Array.isArray(r.lignes)) ex.lignes.push(...r.lignes.filter(l => l && l.libelle));
+    if (Array.isArray(r.autres)) ex.autres.push(...r.autres.filter(a => a && a.libelle));
+    if (lis.indexOf(r.lisibilite) > lis.indexOf(ex.lisibilite)) ex.lisibilite = r.lisibilite;
+  };
+  // Modes Rapide / Standard : un PDF numérique est lu en UNE seule demande (texte exact de toutes les pages, sans image)
+  const mode = regl().mode;
+  if (isPdf && mode !== "precis") {
+    const txts = canvases.map(c => c.pdfText || "");
+    const toutNumerique = txts.every(t => t.replace(/\s/g, "").length > 150);
+    const utiles = txts.map((t, i) => ({ t, i })).filter(({ t, i }) => i === 0 || /\d+[,.]\d{2}/.test(t));
+    const texte = utiles.map(({ t, i }) => `=== PAGE ${i+1}/${txts.length} ===\n${t}`).join("\n");
+    if (toutNumerique && texte.length <= 38000) {
+      setQ(q, { msg: `lecture de la facture (${txts.length} page${txts.length>1?"s":""}, 1 demande)…` });
+      fusion(await appelIA({ multi: true, page: 1, pages: txts.length, nb: 0, texte }, [], q, "facture", mode === "rapide" ? "quick" : "default"));
+      return ex;
+    }
+  }
+  // lecture page par page (scans, photos, mode Précis) : il faut le fichier lui-même
+  if (canvases.some(c => !c.canvas)) { setQ(q, { msg: "chargement du document…" }); canvases = await src.loadPages(); }
+  for (let i = 0; i < canvases.length; i++) {
+    setQ(q, { msg: `lecture page ${i+1}/${canvases.length}…` });
+    const txt = canvases[i].pdfText || "";
+    const nChars = txt.replace(/\s/g, "").length;
+    const numerique = nChars > 150 || (!canImg && nChars > 40);   // PDF numérique : texte exact disponible
+    let imgs = [];
+    if (numerique) {
+      if (i > 0 && !/\d+[,.]\d{2}/.test(txt)) continue;       // page sans aucun montant (mentions légales)
+      if (canImg) { try { imgs = [await toBlob(scaled(await canvases[i].canvas(), 1800), 0.85)]; } catch (e) { console.warn("image de page indisponible, lecture sur le texte seul", e); } }
+    } else {
+      if (!canImg) {
+        if (i > 0) continue;
+        throw { code: "scan_sans_images", message: "document scanné et images indisponibles" };
+      }
+      let cv;
+      try { cv = await canvases[i].canvas(); } catch (e) { throw { code: "rendu", message: e.message }; }
+      const o = await orientation(cv);
+      if (o.contenu === "rien" && i > 0) continue;
+      const page = rotate(cv, o.rotation);
+      imgs = await Promise.all(bands(page, Math.min(maxImg, 3)).map(b => toBlob(b)));
+    }
+    const ctx = { page:i+1, pages:canvases.length, nb:imgs.length, texte:numerique ? txt.slice(0, 20000) : "", fournisseur:ex.fournisseur, numero:ex.numero, nLignes:ex.lignes.length, dernier:ex.lignes.at(-1)?.libelle };
+    let r;
+    try { r = await appelIA(ctx, imgs, q, `page ${i+1}/${canvases.length}`); }
+    catch (e) {
+      if (e?.code !== "images_unavailable") throw e;
+      if (nChars <= 40) throw { code: "scan_sans_images", message: e.message };
+      canImg = false;                                           // la vue refuse les images : relecture sur le texte seul
+      r = await appelIA({ ...ctx, nb: 0, texte: txt.slice(0, 20000) }, [], q, `page ${i+1}/${canvases.length}`);
+    }
+    fusion(r);
+  }
+  return ex;
+}
+/* Erreurs passagères de l'agent IA (service indisponible, réponse coupée ou illisible) :
+   la page est relue automatiquement jusqu'à 3 fois, avec une attente croissante. */
+const TRANSITOIRES = ["upstream_error", "invalid_json", "empty_completion", "timeout", "transform_error"];
+const attendre = ms => new Promise(r => setTimeout(r, ms));
+async function appelIA(ctx, imgs, q, etiquette, tier = "default"){
+  const pauses = [5000, 15000, 40000];
+  for (let essai = 0; ; essai++) {
+    try {
+      const opts = { modelTier: tier }; if (imgs.length) opts.images = imgs;
+      if (essai) opts.cache = false;
+      return await sample.json(pagePrompt({ ...ctx, relance: essai > 0 && q._dernierCode === "invalid_json" }), opts);
+    } catch (e) {
+      const code = e && e.code || "upstream_error";
+      if (!TRANSITOIRES.includes(code) || essai >= pauses.length) throw e;
+      q._dernierCode = code;
+      setQ(q, { msg: `${etiquette} : ${code === "invalid_json" ? "réponse illisible" : "agent indisponible"}, nouvel essai ${essai+1}/${pauses.length} dans ${pauses[essai]/1000} s…` });
+      await attendre(pauses[essai]);
+    }
+  }
+}
+function setQ(q, patchObj){ Object.assign(q, patchObj); const el = $("#queue"); if (el && UI.tab === "factures") el.innerHTML = queueHtml(); }
+function setStep(q, k, v){ q.steps[k] = v; setQ(q, {}); }
+
+/* --- import en lot : tous les fichiers sont mis en file d'attente, 2 lectures IA en parallèle --- */
+/* Réglages d'import (mémorisés dans ce navigateur) */
+const REGLAGES_DEFAUT = { parallele: 3, mode: "standard", analyse2: true, auto: true };
+function reglages(){ try { return { ...REGLAGES_DEFAUT, ...JSON.parse(localStorage.getItem("bs-import") || "{}") }; } catch(_) { return { ...REGLAGES_DEFAUT }; } }
+function setReglage(k, v){ const r = { ...reglages(), [k]: v }; try { localStorage.setItem("bs-import", JSON.stringify(r)); } catch(_) {} REGL_MEM = r; }
+let REGL_MEM = null;
+const regl = () => REGL_MEM || (REGL_MEM = reglages());
+function reglagesHtml(){
+  const r = regl();
+  return `<div class="row small" style="margin-top:10px;gap:14px">
+    <label class="row" style="gap:6px">Lectures simultanées <select data-reglage="parallele" style="width:auto">${[1,2,3,4,6].map(n => `<option value="${n}" ${r.parallele==n?"selected":""}>${n}</option>`).join("")}</select></label>
+    <label class="row" style="gap:6px">Mode <select data-reglage="mode" style="width:auto">
+      <option value="rapide" ${r.mode==="rapide"?"selected":""}>Rapide : 1 demande par facture, modèle rapide</option>
+      <option value="standard" ${r.mode==="standard"?"selected":""}>Standard : 1 demande par facture</option>
+      <option value="precis" ${r.mode==="precis"?"selected":""}>Précis : page par page avec image</option></select></label>
+    <label class="row" style="gap:6px"><input type="checkbox" data-reglage="analyse2" ${r.analyse2?"checked":""}> Analyse IA des alertes en parallèle</label>
+    <label class="row" style="gap:6px"><input type="checkbox" data-reglage="auto" ${r.auto?"checked":""}> Lire automatiquement les factures en attente à l'ouverture</label>
+  </div>`;
+}
+let verrou = Promise.resolve();
+function exclusif(fn){ const p = verrou.then(fn); verrou = p.catch(() => {}); return p; }   // contrôles + enregistrement, une facture à la fois
+const MIME = { pdf:"application/pdf", jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif" };
+const extOf = n => (String(n).toLowerCase().match(/\.([a-z0-9]+)$/) || [])[1] || "";
+const estFacture = f => /^image\//.test(f.type) || f.type === "application/pdf" || !!MIME[extOf(f.name)];
+const estZip = f => /zip/.test(f.type) || extOf(f.name) === "zip";
+let zipReady = null;
+function ensureZip(){ return zipReady ||= loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js").then(() => window.JSZip); }
+/* Ouvre une archive ZIP (dossiers et ZIP imbriqués compris) et renvoie une entrée par PDF ou image :
+   le contenu n'est décompressé qu'au moment où la facture passe en lecture. */
+async function entreesZip(blob, nomZip, profondeur = 0){
+  const JSZip = await ensureZip();
+  const zip = await JSZip.loadAsync(blob);
+  const out = []; let ignores = 0;
+  for (const e of Object.values(zip.files)) {
+    if (e.dir) continue;
+    const base = e.name.split("/").pop();
+    if (!base || base.startsWith(".") || e.name.includes("__MACOSX/")) continue;
+    const ext = extOf(base);
+    if (ext === "zip" && profondeur < 2) { try { out.push(...await entreesZip(await e.async("blob"), base, profondeur + 1)); } catch(_) { ignores++; } continue; }
+    if (!MIME[ext]) { ignores++; continue; }
+    out.push({ name: base, source: nomZip, load: async () => new File([await e.async("blob")], base, { type: MIME[ext] }) });
+  }
+  out.ignores = ignores;
+  return out;
+}
+/* ================= IMPORT EN DEUX TEMPS =================
+   1. Import (sans IA, rapide) : doublons, stockage de l'original, extraction du texte → facture « à lire ».
+   2. Lecture IA (ensuite, file séparée) : lecture, contrôles, entrées de stock. Elle repart des factures
+      « à lire » enregistrées : fermer la page n'efface rien, il suffit de relancer la lecture. */
+const IMPORT_PARALLELE = 4;
+const fImport = [], fIA = [], fAna = [];
+let nImport = 0, nIA = 0, nAna = 0;
+const FICHIERS = new Map();            // fid → File (ou chargeur ZIP) gardé en mémoire pour la lecture IA
+const hashesLot = new Map();
+async function importerFichiers(files){
+  files = [...files];
+  const entrees = []; let ignores = 0;
+  for (const f of files) {
+    if (estZip(f)) {
+      toast(`Ouverture de ${f.name}…`);
+      try { const z = await entreesZip(f, f.name); ignores += z.ignores || 0; entrees.push(...z);
+        if (!z.length) toast(`${f.name} : aucun PDF ni image dans l'archive`); }
+      catch(e) { console.error(e); toast(`${f.name} : archive ZIP illisible`); }
+    } else if (estFacture(f)) entrees.push({ name: f.name, file: f });
+    else ignores++;
+  }
+  if (ignores) setTimeout(() => toast(`${ignores} fichier${ignores>1?"s":""} ignoré${ignores>1?"s":""} (seuls PDF, images et ZIP sont acceptés)`), 1500);
+  if (!entrees.length) return;
+  const items = entrees.map(x => ({ id: uid("q"), name: x.name, source: x.source || "", file: x.file || null, load: x.load || null, msg: "en attente d'import", state: "wait", phase: "import", steps: {} }));
+  const actifs = UI.queue.filter(q => q.state === "wait" || q.state === "run" || q.state === "lu_attente");
+  const finis = UI.queue.filter(q => !actifs.includes(q)).slice(0, Math.max(0, 2000 - actifs.length - items.length));
+  UI.queue = [...actifs, ...items, ...finis];
+  fImport.push(...items);
+  setQ(items[0], {});
+  if (items.length > 1) toast(`${items.length} fichiers ajoutés : import immédiat, lecture IA ensuite`);
+  pomper();
+}
+function pomper(){
+  while (nImport < IMPORT_PARALLELE && fImport.length) {
+    const q = fImport.shift(); nImport++;
+    importerUn(q).finally(() => { nImport--; pomper(); });
+  }
+  while (!UI.pause && nIA < (+regl().parallele || 2) && fIA.length) {
+    const q = fIA.shift(); nIA++;
+    lireUne(q).finally(() => { nIA--; pomper(); });
+  }
+  // analyse des alertes : 1 à la fois, en parallèle de la lecture
+  while (!UI.pause && nAna < 1 && fAna.length) {
+    const { fid, q } = fAna.shift(); nAna++;
+    (async () => { setStep(q, "ana", "run"); await analyserFacture(fid); setStep(q, "ana", S.factures[fid]?.analyseIA ? "done" : "err"); })()
+      .finally(() => { nAna--; pomper(); });
+  }
+  majEnAttente();
+}
+function suspendre(raison){ UI.pause = raison || "manuel"; setQ({}, {}); }
+function reprendre(){ UI.pause = null; setQ({}, {}); pomper(); }
+
+/* ---- phase 1 : import ---- */
+async function importerUn(q){
+  setQ(q, { state: "run", msg: "import…" });
+  let hash = null;
+  try {
+    setStep(q, "import", "run");
+    const file = q.file || (q.load ? await q.load() : null);
+    if (!file) throw new Error("fichier illisible dans l'archive");
+    const importedAt = new Date().toISOString();
+    const buf = await file.arrayBuffer();
+    setStep(q, "import", "done");
+    setStep(q, "hash", "run");
+    hash = await sha256(buf);
+    if (hashesLot.has(hash)) { hash = null; setStep(q, "hash", "err"); setQ(q, { state:"dup", msg:"fichier identique à un autre fichier de ce lot : ignoré" }); return; }
+    hashesLot.set(hash, q.id);
+    const same = Object.values(S.factures).find(f => f.hash === hash);
+    if (same) { setStep(q, "hash", "err"); setQ(q, { state:"dup", msg: same.statut === "a_lire" ? "déjà importée, lecture IA en attente" : `déjà importée (${same.fournisseur||"?"} n° ${same.numero||"?"}) : ignorée` }); return; }
+    setStep(q, "hash", "done");
+    setStep(q, "stock", "run");
+    let fichier = { nom: file.name, type: file.type };
+    if (assets) { try { const a = await assets.upload(file); fichier = { ...fichier, assetId: a.id, url: a.url }; setStep(q, "stock", "done"); } catch(e){ console.warn(e); setStep(q, "stock", "err"); } }
+    else { setStep(q, "stock", "err"); fichier.note = "original non conservé : stockage réservé au propriétaire"; }
+    setStep(q, "texte", "run");
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+    let textes = [];
+    if (isPdf) { const pages = await pdfPages(buf, 8); textes = pages.map(p => (p.pdfText || "").slice(0, 20000)); pages.destroy(); }
+    setStep(q, "texte", "done");
+    const fid = uid("f");
+    FICHIERS.set(fid, q.load || file);
+    await save("factures", fid, { statut: "a_lire", fournisseur: "", numero: "", date: "", importedAt, hash, fichier, isPdf, textes, lignes: [], alertes: [], totalHT: null });
+    q.fid = fid; q.phase = "ia";
+    const numerique = isPdf && textes.length && textes.every(t => t.replace(/\s/g, "").length > 150);
+    setQ(q, { state: "lu_attente", msg: numerique ? `importée · ${textes.length} page${textes.length>1?"s":""} de texte · lecture IA en attente` : "importée · document scanné ou photo · lecture IA en attente" });
+    if (!q.file) q.file = null;
+    fIA.push(q);
+  } catch (e) {
+    console.error(e);
+    for (const k in q.steps) if (q.steps[k] === "run") q.steps[k] = "err";
+    setQ(q, { state: "err", msg: "import : " + errMsg(e), code: (e && e.code) || "import" });
+  } finally {
+    if (hash && hashesLot.get(hash) === q.id) hashesLot.delete(hash);
+    if (q.load) q.file = null;
+  }
+}
+
+/* ---- phase 2 : lecture IA ---- */
+async function fichierDe(f){
+  const src = FICHIERS.get(f.id);
+  if (src instanceof Blob) return src;
+  if (typeof src === "function") return await src();
+  const url = f.fichier?.url || (f.fichier?.assetId ? "/_blob/" + f.fichier.assetId : null);
+  if (!url) throw { code: "fichier_absent", message: "original non conservé" };
+  const r = await fetch(url); if (!r.ok) throw { code: "fichier_absent", message: "original inaccessible (" + r.status + ")" };
+  return new File([await r.blob()], f.fichier.nom || "facture", { type: f.fichier.type || (f.isPdf ? "application/pdf" : "") });
+}
+function lancerLecture(){
+  // reprend toutes les factures « à lire » enregistrées (y compris après fermeture de la page)
+  const dejaEnFile = new Set(UI.queue.filter(q => q.fid && (q.state === "lu_attente" || q.state === "run")).map(q => q.fid));
+  const nouvelles = Object.values(S.factures).filter(f => f.statut === "a_lire" && !dejaEnFile.has(f.id));
+  const items = nouvelles.map(f => ({ id: uid("q"), name: f.fichier?.nom || f.id, source: "", fid: f.id, phase: "ia", state: "lu_attente", msg: "lecture IA en attente", steps: { import:"done", hash:"done", stock: f.fichier?.url ? "done" : "err", texte:"done" } }));
+  UI.queue = [...items, ...UI.queue];
+  fIA.push(...items);
+  UI.pause = null;
+  setQ(items[0] || {}, {});
+  if (items.length) toast(`Lecture IA lancée pour ${items.length} facture${items.length>1?"s":""}`);
+  pomper();
+}
+async function lireUne(q){
+  const f0 = S.factures[q.fid];
+  if (!f0 || f0.statut !== "a_lire") { setQ(q, { state: "done", msg: "déjà lue" }); return; }
+  setQ(q, { state: "run", msg: "lecture par l'agent IA…" });
+  try {
+    setStep(q, "ia", "run");
+    const importedAt = f0.importedAt, hash = f0.hash, fichier = f0.fichier;
+    let file = null;
+    const src = { isPdf: !!f0.isPdf,
+      pages: (f0.textes && f0.textes.length) ? f0.textes.map(t => ({ pdfText: t, canvas: null })) : [{ pdfText: "", canvas: null }],
+      loadPages: async () => { file = file || await fichierDe(f0); const buf = await file.arrayBuffer();
+        return src.isPdf ? await pdfPages(buf, 8) : [{ pdfText: "", canvas: () => imageToCanvas(file) }]; } };
+    const ex = await lireFacture(src, q);
+    const horsStock = !ex.lignes.length && (ex.autres||[]).length > 0;   // ex. facture de droguerie seule : achat compté, pas d'entrée de stock
+    if (!ex.lignes.length && !horsStock) throw new Error("Aucune ligne lue sur ce document");
+    setStep(q, "ia", "done");
+    setStep(q, "ctrl", "run"); setQ(q, { msg:"contrôles…" });
+    const fid = q.fid;
+    const { alertes, statut, lignes } = await exclusif(async () => {
+    const R = rules(), prixAvant = prixProduits();
+    const alertes = [];
+    const lignes = [];
+    for (const l of ex.lignes) {
+      let pid = l.produitId && S.produits[l.produitId] ? l.produitId : null;
+      if (!pid) {
+        const np = l.nouveauProduit || { nom: l.libelle, unite: "pc", categorie: "Divers" };
+        const exist = Object.values(S.produits).find(p => !p.demo && norm(p.nom) === norm(np.nom));
+        if (exist) pid = exist.id;
+        else { pid = uid("p"); await save("produits", pid, { nom: np.nom || l.libelle, unite: BASE_UNITS.includes(np.unite) ? np.unite : "pc", categorie: np.categorie || "Divers", conversions: {}, createdAt: importedAt, source: "facture" }); }
+      }
+      const prod = S.produits[pid];
+      const nu = normUnit(l.unite);
+      const f = factor(prod, l.unite, +l.facteurBase);
+      if (!STD[nu] && nu && !(prod.conversions||{})[nu] && +l.facteurBase > 0) await patch("produits", pid, { conversions: { ...(prod.conversions||{}), [nu]: +l.facteurBase } });
+      const qte = +l.qte || 0, pu = +l.pu || 0, total = l.total != null ? +l.total : qte*pu;
+      const qteBase = qte * f;
+      const puBase = qteBase > 0 ? total / qteBase : 0;
+      lignes.push({ libelle: l.libelle || "", produitId: pid, qte, unite: l.unite || "", facteur: f, qteBase, pu, total, puBase, remise: +l.remise || 0 });
+      // 3.4 règles
+      if (qte <= 0) alertes.push({ type:"Quantité", niveau:"crit", message:`${l.libelle} : quantité nulle ou négative.` });
+      else if (qte*pu > 0 && Math.abs(qte*pu - total) > Math.max(0.05, total*R.seuilCalcul) && Math.abs(qte*pu - (+l.remise||0) - total) > Math.max(0.05, total*R.seuilCalcul)) alertes.push({ type:"Calcul ligne", niveau:"warn", message:`${l.libelle} : ${nf(qte,3)} × ${eur(pu)} = ${eur(qte*pu)} ≠ total ligne ${eur(total)}.` });
+      const pm = prixAvant[pid]?.pm;
+      if (pm && puBase && Math.abs(puBase - pm)/pm > R.seuilPrix) alertes.push({ type:"Variation prix", niveau:"warn", message:`${prod.nom} : ${eur(puBase)}/${prod.unite} contre ${eur(pm)} en moyenne (${puBase>pm?"+":""}${pct((puBase-pm)/pm,0)}).` });
+    }
+    const sumL = lignes.reduce((a,l)=>a+l.total,0) + (ex.autres||[]).filter(o=>!o.horsHT).reduce((a,o)=>a+(+o.total||0),0);
+    if (ex.totalHT != null && +ex.totalHT > 0 && Math.abs(sumL - ex.totalHT) > Math.max(0.1, ex.totalHT*R.seuilTotal)) alertes.push({ type:"Total facture", niveau:"warn", message:`Somme des lignes ${eur(sumL)} ≠ total HT imprimé ${eur(+ex.totalHT)}.` });
+    if (!ex.date) alertes.push({ type:"Date", niveau:"warn", message:"Date de facture non lue : la date d'import est utilisée provisoirement. Corrigez-la dans le détail de la facture." });
+    if (ex.lisibilite === "faible") alertes.push({ type:"Lisibilité", niveau:"warn", message:"Document peu lisible : extraction à vérifier." });
+    // doublons par règles (même fournisseur + numéro / même montant proche date)
+    let statut = "traitee", doublonDe = null;
+    const fn = norm(ex.fournisseur);
+    for (const o of Object.values(S.factures)) {
+      if (o.id === fid || o.statut === "doublon" || o.statut === "a_lire" || norm(o.fournisseur) !== fn) continue;
+      if (ex.numero && norm(o.numero) === norm(ex.numero)) { statut = "doublon"; doublonDe = o.id; alertes.unshift({ type:"Doublon", niveau:"crit", message:`Même fournisseur et même numéro que la facture importée le ${new Date(o.importedAt).toLocaleDateString("fr-FR")}. Aucune entrée de stock créée.` }); break; }
+      const dd = Math.abs((new Date(o.date) - new Date(ex.date))/864e5);
+      if (o.totalHT && ex.totalHT && Math.abs(o.totalHT - ex.totalHT) < 0.01 && dd <= 3) alertes.push({ type:"Doublon potentiel", niveau:"warn", message:`Montant identique (${eur(+ex.totalHT)}) à la facture ${o.numero} du ${fdate(o.date)} du même fournisseur.` });
+    }
+    setStep(q, "ctrl", alertes.length ? "err" : "done");
+    await save("factures", fid, { fournisseur: ex.fournisseur||"", numero: String(ex.numero||""), date: ex.date || iso(importedAt), dateProvisoire: !ex.date, importedAt, hash, fichier, lignes,
+      autres: ex.autres || [], totalHT: ex.totalHT ?? null, tva: ex.tva ?? null, totalTTC: ex.totalTTC ?? null, statut, doublonDe, alertes, analyseIA: "" });
+    // 3.1 mouvement d'entrée
+    if (statut !== "doublon" && lignes.length) { setStep(q, "entree", "run"); await creerEntrees(fid); setStep(q, "entree", "done"); }
+    return { alertes, statut, lignes };
+    });
+    FICHIERS.delete(fid);
+    if (alertes.length && regl().analyse2 && sample) { setStep(q, "ana", "wait"); fAna.push({ fid, q }); }   // analyse en parallèle, sans retarder la lecture suivante
+    setQ(q, { state: statut === "doublon" ? "dup" : "done", msg: `${ex.fournisseur||""} · ${horsStock ? `hors stock uniquement (${ex.autres.length} ligne${ex.autres.length>1?"s":""} frais / non alimentaire)` : `${lignes.length} lignes`}${alertes.length?` · ${alertes.length} alerte${alertes.length>1?"s":""}`:""}` });
+  } catch (e) {
+    console.error(e);
+    if (e && (e.code === "rate_limited" || e.code === "session_expired")) {
+      q.steps = { ...q.steps, ia: undefined }; setQ(q, { state: "lu_attente", msg: "lecture IA en attente (pause)" }); fIA.unshift(q);
+      if (!UI.pause) suspendre(e.code === "rate_limited" ? "limite" : "session");
+      return;
+    }
+    for (const k in q.steps) if (q.steps[k] === "run") q.steps[k] = "err";
+    setQ(q, { state: "err", msg: "lecture IA : " + errMsg(e), code: (e && e.code) || "erreur", essais: (q.essais || 0) + 1 });
+    patch("factures", q.fid, { erreurLecture: errMsg(e) });
+    journal("Échec lecture facture", q.name, `${(e && e.code) || "erreur"} : ${String((e && e.message) || "").slice(0, 200)}`);
+  }
+}
+function relancerEchecs(){
+  const echecs = UI.queue.filter(q => q.state === "err");
+  for (const q of echecs) {
+    q.steps = {}; q.state = q.fid ? "lu_attente" : "wait"; q.msg = "nouvel essai…";
+    if (q.fid) { q.steps = { import:"done", hash:"done", stock:"done", texte:"done" }; fIA.push(q); } else if (q.file || q.load) fImport.push(q);
+  }
+  setQ(echecs[0] || {}, {}); pomper();
+}
+function relanceAuto(){
+  // fin de lecture : les factures en échec pour une raison passagère repartent une fois, automatiquement
+  if (UI.pause || fImport.length || nImport || fIA.length || nIA) return;
+  const aRelancer = UI.queue.filter(q => q.state === "err" && q.fid && (q.essais || 0) < 2 && !["scan_sans_images","not_granted","fichier_absent"].includes(q.code));
+  if (!aRelancer.length) return;
+  toast(`Nouvel essai automatique pour ${aRelancer.length} facture${aRelancer.length>1?"s":""} en échec`);
+  for (const q of aRelancer) { q.state = "lu_attente"; q.msg = "nouvel essai automatique…"; q.steps = { import:"done", hash:"done", stock:"done", texte:"done" }; fIA.push(q); }
+  setTimeout(pomper, 20000);
+  setQ(aRelancer[0], {});
+}
+function majEnAttente(){
+  if (!fImport.length && !nImport && !fIA.length && !nIA) setTimeout(relanceAuto, 0);
+  window.onbeforeunload = (fImport.length || nImport) ? () => "Import en cours" : null;
+}
+function errMsg(e){
+  const c = e && e.code;
+  if (c === "not_granted") return "accès à l'agent IA refusé";
+  if (c === "rate_limited") return "trop de demandes, réessayez dans un moment";
+  if (c === "invalid_json") return "réponse de l'agent illisible, réessayez";
+  if (c === "image_rejected") return "image refusée (format ou taille)";
+  if (c === "images_unavailable") return "lecture d'images indisponible dans cette vue";
+  if (c === "timeout") return "délai dépassé (" + (e.message || "") + "), relancez ce fichier";
+  if (c === "rendu") return "page impossible à afficher (" + (e.message || "") + ")";
+  if (c === "scan_sans_images") return "document scanné ou photo : cette vue ne permet pas de lire les images. Déposez-le depuis claude.ai sur ordinateur, ou utilisez le PDF numérique du fournisseur";
+  return (e && e.message) || "erreur inconnue";
+}
+async function creerEntrees(fid){
+  const f = S.factures[fid];
+  await save("entrees", fid, { factureId: fid, date: f.date, fournisseur: f.fournisseur, createdAt: new Date().toISOString(),
+    lignes: (f.lignes||[]).filter(l => l.qteBase > 0).map(l => ({ produitId: l.produitId, qteBase: l.qteBase, puBase: l.puBase, montant: l.total })) });
+}
+async function analyserFacture(fid){
+  const f = S.factures[fid]; if (!f || !sample) return;
+  const key = "fac-" + fid; UI.anaBusy[key] = true; scheduleRender();
+  const prix = prixProduits();
+  const hist = (f.lignes||[]).map(l => ({ produit: S.produits[l.produitId]?.nom, unite: S.produits[l.produitId]?.unite, prixCetteFacture: +l.puBase.toFixed(3), prixMoyen: +(prix[l.produitId]?.pm||0).toFixed(3), dernierPrix: +(prix[l.produitId]?.last||0).toFixed(3) }));
+  const autres = Object.values(S.factures).filter(o => o.id !== fid && norm(o.fournisseur) === norm(f.fournisseur)).slice(0, 8).map(o => ({ numero:o.numero, date:o.date, totalHT:o.totalHT, statut:o.statut }));
+  const prompt = `Tu es l'agent IA de contrôle des factures d'un restaurant. Le système a levé des alertes automatiques sur une facture fournisseur.
+Analyse-les pour le chef de restaurant : pour chaque alerte, dis si elle semble réelle ou un faux positif (erreur de lecture, conditionnement, remise…), la cause probable, et l'action concrète conseillée. Pas de stock réel dans cet outil : ne parle pas d'écart d'inventaire.
+Réponds en français, 3 à 6 phrases courtes, sans titre ni markdown.
+
+Facture : ${JSON.stringify({ fournisseur:f.fournisseur, numero:f.numero, date:f.date, totalHT:f.totalHT, lignes:(f.lignes||[]).map(l=>({libelle:l.libelle,qte:l.qte,unite:l.unite,pu:l.pu,total:l.total})) })}
+Alertes : ${JSON.stringify(f.alertes)}
+Historique de prix par produit (par unité de stock) : ${JSON.stringify(hist)}
+Autres factures du même fournisseur : ${JSON.stringify(autres)}`;
+  try { const { text } = await sample(prompt, { modelTier: "default", cache: false }); await patch("factures", fid, { analyseIA: text.trim() }); }
+  catch(e){ toast("Analyse IA : " + errMsg(e)); }
+  finally { delete UI.anaBusy[key]; scheduleRender(); }
+}
+
+/* ============ VIEW: stock & produits ============ */
+function vStock(){
+  const prix = prixProduits(), range = periodRange(), ent = entreesPeriode(range);
+  const prods = Object.values(S.produits).sort((a,b)=>(a.categorie||"").localeCompare(b.categorie||"") || a.nom.localeCompare(b.nom));
+  const mv = Object.values(S.entrees).filter(e => inRange(e.date||"", range)).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  return `${statusBanner()}
+  <div class="row between"><div><h2>Entrées de stock</h2><div class="muted small">${range[2]} · chaque facture intégrée devient un mouvement d'entrée</div></div>${periodSeg()}</div>
+  <section class="panel">
+    <header><div><h3>Référentiel produits</h3><p>Unité de stock, conversions apprises depuis les factures, prix d'achat réels</p></div><span class="role sys">Système</span></header>
+    ${prods.length ? `<div class="tw"><table><thead><tr><th>Produit</th><th>Catégorie</th><th>Unité</th><th>Conversions</th><th class="r">Entrées période</th><th class="r">Dernier prix</th><th class="r">Prix moyen</th><th class="r">Achats</th></tr></thead><tbody>
+      ${prods.map(p => { const a = prix[p.id], e = ent.res[p.id]; const conv = Object.entries(p.conversions||{}).map(([u,f])=>`1 ${u} = ${nf(f,3)} ${p.unite}`).join(" · ");
+        return `<tr><td>${esc(p.nom)}</td><td class="muted">${esc(p.categorie||"")}</td><td class="mono">${esc(p.unite)}</td><td class="small muted">${esc(conv)||"—"}</td><td class="r">${e?nf(e.q)+" "+esc(p.unite):"—"}</td><td class="r">${a?.last?eur(a.last)+"/"+esc(p.unite):"—"}</td><td class="r">${a?.pm?eur(a.pm):"—"}</td><td class="r">${a?.n||0}</td></tr>`; }).join("")}
+    </tbody></table></div>` : `<div class="empty">Le référentiel se remplit automatiquement à la lecture des factures.</div>`}
+  </section>
+  <section class="panel">
+    <header><div><h3>Mouvements d'entrée</h3><p>${mv.length} mouvement${mv.length>1?"s":""} · ${eur(ent.valeur)} HT</p></div><span class="role sys">Système</span></header>
+    ${mv.length ? `<div class="tw"><table><thead><tr><th>Date</th><th>Fournisseur</th><th>Produit</th><th class="r">Quantité entrée</th><th class="r">Prix réel</th><th class="r">Montant</th></tr></thead><tbody>
+      ${mv.flatMap(e => (e.lignes||[]).map(l => { const p = S.produits[l.produitId]; return `<tr><td>${fdate(e.date)}</td><td>${esc(e.fournisseur||"")}</td><td>${esc(p?.nom||"?")}</td><td class="r">${nf(l.qteBase,3)} ${esc(p?.unite||"")}</td><td class="r">${eur(+l.puBase)}</td><td class="r">${eur(+l.montant)}</td></tr>`; })).join("")}
+    </tbody></table></div>` : `<div class="empty">Aucune entrée sur la période.</div>`}
+  </section>`;
+}
+
+/* ============ VIEW: fiches techniques ============ */
+function vFiches(){
+  return `${statusBanner()}
+  <div class="row between"><div><h2>Fiches techniques</h2><div class="muted small">Saisies et validées par le chef · coût matière, marge et food cost calculés automatiquement · aucune intervention de l'agent IA</div></div>
+  ${can("fiches") ? `<button class="btn primary" data-new-recette ${UI.editRecette?"disabled":""}>Nouvelle fiche technique</button>` : ""}</div>
+  <div id="recette-editor"></div>
+  <section class="panel"><div id="fiches-list"></div></section>`;
+}
+function renderFichesList(){
+  const el = $("#fiches-list"); if (!el) return;
+  const prix = prixProduits();
+  const list = Object.values(S.recettes).sort((a,b)=>a.nom.localeCompare(b.nom));
+  el.innerHTML = list.length ? `<div class="tw"><table><thead><tr><th>Plat</th><th class="r">Ingrédients</th><th>Allergènes</th><th class="r">Prix TTC</th><th class="r">Coût matière</th><th class="r">Marge HT</th><th class="r">Food cost</th><th></th></tr></thead><tbody>
+    ${list.map(r => { const c = coutRecette(r, prix); return `<tr><td><b>${esc(r.nom)}</b>${c.manquants.length?`<br><span class="small muted">sans prix : ${esc(c.manquants.join(", "))}</span>`:""}</td><td class="r">${(r.ingredients||[]).length}</td><td class="small">${(r.allergenes||[]).map(esc).join(", ")||"<span class='muted'>aucun</span>"}</td><td class="r">${eur(+r.prixVenteTTC)}</td><td class="r">${eur(c.cout)}</td><td class="r">${eur(c.marge)}</td><td class="r">${fcPill(c.foodCost)}</td><td class="r">${can("fiches") ? `<button class="btn sm" data-edit-recette="${r.id}" ${UI.editRecette?"disabled":""}>Modifier</button>` : ""}</td></tr>`; }).join("")}
+  </tbody></table></div>` : `<div class="empty">Aucune fiche technique. Créez la première : ingrédients, quantités, allergènes et prix de vente.</div>`;
+}
+function mountRecetteEditor(){
+  const host = $("#recette-editor"); if (!host) return;
+  const r = UI.editRecette;
+  const prods = Object.values(S.produits).sort((a,b)=>a.nom.localeCompare(b.nom));
+  host.innerHTML = `<section class="panel chef-zone"><form id="recette-form" autocomplete="off">
+    <header><div><h3>${r.id && S.recettes[r.id] ? "Modifier la fiche" : "Nouvelle fiche technique"}</h3><p>Le chef saisit et valide. Le système enregistre et calcule.</p></div><span class="role chef">Chef · saisie</span></header>
+    <div class="fgrid">
+      <div class="field" style="grid-column:span 2"><label for="rf-nom">Nom du plat (tel qu'en caisse)</label><input type="text" id="rf-nom" required value="${esc(r.nom||"")}"></div>
+      <div class="field"><label for="rf-pv">Prix de vente TTC (€)</label><input type="number" id="rf-pv" step="0.01" min="0" value="${esc(r.prixVenteTTC??"")}"></div>
+      <div class="field"><label for="rf-por">Nombre de portions</label><input type="number" id="rf-por" step="1" min="1" value="${esc(r.portions||1)}"></div>
+    </div>
+    <h3 style="margin:18px 0 8px">Ingrédients</h3>
+    <div id="rf-ingr" style="display:grid;gap:8px"></div>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn sm" id="rf-add">Ajouter un ingrédient</button>
+      ${!prods.length ? `<span class="small muted">Le référentiel produits est vide : importez d'abord des factures.</span>` : ""}</div>
+    <h3 style="margin:18px 0 8px">Allergènes</h3>
+    <div class="allerg">${ALLERGENES.map((a,i) => `<label><input type="checkbox" id="rf-al-${i}" value="${esc(a)}" ${(r.allergenes||[]).includes(a)?"checked":""}>${esc(a)}</label>`).join("")}</div>
+    <h3 style="margin:18px 0 8px">Calcul automatique <span class="role sys" style="margin-left:6px">Système</span></h3>
+    <div class="calc" id="rf-calc"></div>
+    <div class="row between" style="margin-top:16px">
+      <div>${r.id && S.recettes[r.id] ? (UI.confirmDel === r.id ? `<span class="confirm">Supprimer cette fiche ? <button type="button" class="btn danger sm" id="rf-del-yes">Supprimer</button><button type="button" class="btn ghost sm" id="rf-del-no">Annuler</button></span>` : `<button type="button" class="btn ghost danger sm" id="rf-del">Supprimer la fiche</button>`) : ""}</div>
+      <div class="row"><button type="button" class="btn ghost" id="rf-cancel">Annuler</button><button type="submit" class="btn primary">Valider la fiche</button></div>
+    </div>
+  </form></section>`;
+  const ing = $("#rf-ingr");
+  const addRow = (x = {}) => {
+    const i = uid("i");
+    const d = document.createElement("div"); d.className = "ingr"; d.dataset.row = i;
+    d.innerHTML = `<select id="rf-p-${i}" aria-label="Produit"><option value="">Produit…</option>${prods.map(p=>`<option value="${p.id}" ${p.id===x.produitId?"selected":""}>${esc(p.nom)} (${esc(p.unite)})</option>`).join("")}</select>
+      <input type="number" id="rf-q-${i}" step="any" min="0" placeholder="Quantité" aria-label="Quantité" value="${esc(x.qte??"")}">
+      <select id="rf-u-${i}" aria-label="Unité">${RECIPE_UNITS.map(u=>`<option ${u===(x.unite||"g")?"selected":""}>${u}</option>`).join("")}</select>
+      <span class="cost" data-cost></span>
+      <button type="button" class="btn ghost sm" data-rm aria-label="Retirer l'ingrédient">Retirer</button>`;
+    d.querySelector("[data-rm]").onclick = () => { d.remove(); refreshRecetteCalc(); };
+    d.querySelector("select").addEventListener("change", e => { const p = S.produits[e.target.value]; if (p && !x.unite) d.querySelector(`#rf-u-${i}`).value = p.unite === "kg" ? "g" : p.unite === "L" ? "cl" : "pc"; });
+    ing.appendChild(d);
+  };
+  (r.ingredients && r.ingredients.length ? r.ingredients : [{}]).forEach(addRow);
+  $("#rf-add").onclick = () => addRow();
+  const form = $("#recette-form");
+  form.addEventListener("input", refreshRecetteCalc);
+  form.addEventListener("change", refreshRecetteCalc);
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = readRecetteForm();
+    if (!data.nom.trim()) { toast("Indiquez le nom du plat."); return; }
+    const id = r.id || uid("r");
+    const prev = S.recettes[id] || {};
+    await save("recettes", id, { ...data, aliases: prev.aliases || [], createdAt: prev.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString(), validePar: "chef" });
+    // relie les ventes déjà importées à cette fiche si le nom correspond
+    await relierVentes();
+    UI.editRecette = null; UI.confirmDel = null; toast("Fiche technique validée"); render();
+  });
+  $("#rf-cancel").onclick = () => { UI.editRecette = null; UI.confirmDel = null; render(); };
+  const del = $("#rf-del"); if (del) del.onclick = () => { UI.confirmDel = r.id; UI.editRecette = { ...r, ...readRecetteForm() }; mountRecetteEditor(); };
+  const yes = $("#rf-del-yes"); if (yes) yes.onclick = async () => { await remove("recettes", r.id); UI.editRecette = null; UI.confirmDel = null; toast("Fiche supprimée"); render(); };
+  const no = $("#rf-del-no"); if (no) no.onclick = () => { UI.confirmDel = null; UI.editRecette = { ...r, ...readRecetteForm() }; mountRecetteEditor(); };
+  refreshRecetteCalc();
+}
+function readRecetteForm(){
+  const rows = [...document.querySelectorAll("#rf-ingr .ingr")].map(d => {
+    const i = d.dataset.row;
+    return { produitId: $(`#rf-p-${i}`).value, qte: parseFloat($(`#rf-q-${i}`).value) || 0, unite: $(`#rf-u-${i}`).value };
+  }).filter(x => x.produitId);
+  return { nom: $("#rf-nom").value.trim(), prixVenteTTC: parseFloat($("#rf-pv").value) || 0, portions: Math.max(1, parseInt($("#rf-por").value) || 1),
+    ingredients: rows, allergenes: ALLERGENES.filter((a,i) => $(`#rf-al-${i}`)?.checked) };
+}
+function refreshRecetteCalc(){
+  const el = $("#rf-calc"); if (!el) return;
+  const data = readRecetteForm(), prix = prixProduits(), c = coutRecette(data, prix);
+  document.querySelectorAll("#rf-ingr .ingr").forEach(d => {
+    const i = d.dataset.row, pid = $(`#rf-p-${i}`).value, q = parseFloat($(`#rf-q-${i}`).value)||0, u = $(`#rf-u-${i}`).value;
+    const p = S.produits[pid], pm = prix[pid]?.pm || 0;
+    d.querySelector("[data-cost]").textContent = pid ? (pm ? eur(q*factor(p,u)*pm) : "pas de prix") : "";
+  });
+  el.innerHTML = `<div><span>Coût matière / portion</span><b>${eur(c.cout)}</b></div><div><span>Prix de vente HT</span><b>${eur(c.pvHT)}</b></div><div><span>Marge matière</span><b>${eur(c.marge)}</b></div><div><span>Food cost</span><b>${pct(c.foodCost)}</b></div>`;
+}
+
+/* ============ VIEW: ventes ============ */
+function vVentes(){
+  const range = periodRange(), vl = ventesLignes(range);
+  const byPlat = {};
+  for (const l of vl) { const k = l.recetteId || ("?" + l.plat); const a = byPlat[k] ||= { plat: l.recetteId ? (S.recettes[l.recetteId]?.nom || l.plat) : l.plat, recetteId: l.recetteId, qte:0, ca:0, libelles:new Set() }; a.qte += +l.qte||0; a.ca += +l.ca||0; a.libelles.add(l.plat); }
+  const rows = Object.values(byPlat).sort((a,b)=>b.ca-a.ca);
+  const days = Object.values(S.ventes).filter(v=>inRange(v.date,range)).length;
+  return `${statusBanner()}
+  <div class="row between"><div><h2>Ventes / tickets de caisse</h2><div class="muted small">${range[2]} · ${days} journée${days>1?"s":""} importée${days>1?"s":""}</div></div>${periodSeg()}</div>
+  <section class="panel" ${can("caisse") ? "" : "hidden"}>
+    <header><div><h3>Importer l'export de l'outil de caisse</h3><p>CSV avec les colonnes date ; plat ; quantité ; montant TTC. Une journée déjà importée est remplacée.</p></div><div class="roles"><span class="role sys">Import · calculs</span><span class="role ia">Plats ambigus</span></div></header>
+    <div class="row">
+      <label class="btn primary" for="csv-in">Choisir un fichier CSV</label><input type="file" id="csv-in" accept=".csv,text/csv,text/plain" hidden>
+      <span class="small muted">ou collez les lignes ci-dessous</span>
+    </div>
+    <div class="field" style="margin-top:10px"><label for="csv-txt">Données de caisse</label><textarea id="csv-txt" placeholder="date;plat;quantite;montant_ttc&#10;2026-09-27;Burger maison;34;612,00"></textarea></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="csv-go">Importer les lignes collées</button><span class="small muted" id="csv-msg"></span></div>
+  </section>
+  <section class="panel">
+    <header><div><h3>Plats vendus</h3><p>Rapprochés automatiquement des fiches techniques</p></div><span class="role sys">Système</span></header>
+    ${rows.length ? `<div class="tw"><table><thead><tr><th>Plat</th><th>Libellés caisse</th><th class="r">Quantité</th><th class="r">CA TTC</th><th class="r">Prix moyen</th><th>Fiche</th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td>${esc(r.plat)}</td><td class="small muted">${[...r.libelles].map(esc).join(", ")}</td><td class="r">${nf(r.qte,0)}</td><td class="r">${eur(r.ca)}</td><td class="r">${eur(r.qte?r.ca/r.qte:0)}</td><td>${r.recetteId?`<span class="pill ok">Reliée</span>`:`<span class="pill warn">Sans fiche</span>`}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">Aucune vente sur la période.</div>`}
+  </section>`;
+}
+function parseNum(s){ if (s == null) return 0; s = String(s).replace(/\s|€/g,""); if (s.includes(",") && !s.includes(".")) s = s.replace(",", "."); else s = s.replace(/,/g,""); return parseFloat(s) || 0; }
+function parseDate(s){ s = String(s||"").trim(); let m;
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) return `${m[1]}-${m[2]}-${m[3]}`;
+  if ((m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/))) { const y = m[3].length === 2 ? "20"+m[3] : m[3]; return `${y}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`; }
+  return null; }
+function parseCaisse(txt){
+  const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return [];
+  const sep = (lines[0].match(/;/g)||[]).length >= (lines[0].match(/,/g)||[]).length ? ";" : (lines[0].includes("\t") ? "\t" : ",");
+  const split = l => l.split(sep).map(c => c.replace(/^"|"$/g,"").trim());
+  let head = split(lines[0]).map(norm), start = 1;
+  let iD = head.findIndex(h=>/date|jour/.test(h)), iP = head.findIndex(h=>/plat|article|produit|libelle|designation|item/.test(h)),
+      iQ = head.findIndex(h=>/qte|quantite|qty|nb|nombre/.test(h)), iC = head.findIndex(h=>/ca|montant|total|ttc|prix/.test(h));
+  if (iD < 0 || iP < 0) { iD = 0; iP = 1; iQ = 2; iC = 3; start = parseDate(split(lines[0])[0]) ? 0 : 1; }
+  const out = [];
+  for (const l of lines.slice(start)) { const c = split(l); const d = parseDate(c[iD]); if (!d || !c[iP]) continue; out.push({ date: d, plat: c[iP], qte: iQ >= 0 ? parseNum(c[iQ]) : 1, ca: iC >= 0 ? parseNum(c[iC]) : 0 }); }
+  return out;
+}
+function matchRecette(plat){
+  const n = norm(plat);
+  for (const r of Object.values(S.recettes)) { if (norm(r.nom) === n || (r.aliases||[]).some(a => norm(a) === n)) return r.id; }
+  return null;
+}
+async function importerVentes(rows){
+  const msg = $("#csv-msg");
+  if (!rows.length) { if (msg) msg.textContent = "Aucune ligne lisible : vérifiez les colonnes date ; plat ; quantité ; montant."; return; }
+  // 5.2 identification déterministe, puis IA sur les ambiguïtés
+  const inconnus = [...new Set(rows.filter(r => !matchRecette(r.plat)).map(r => r.plat))];
+  const mapIA = {};
+  if (inconnus.length && sample && Object.keys(S.recettes).length) {
+    if (msg) msg.textContent = `L'agent IA rapproche ${inconnus.length} libellé${inconnus.length>1?"s":""} ambigu${inconnus.length>1?"s":""}…`;
+    try {
+      const res = await sample.json(`Tu rapproches des libellés de tickets de caisse d'un restaurant avec ses fiches techniques.
+Fiches : ${JSON.stringify(Object.values(S.recettes).map(r=>({id:r.id, nom:r.nom})))}
+Libellés caisse : ${JSON.stringify(inconnus)}
+Pour chaque libellé, donne l'id de la fiche qui correspond au même plat (abréviations, fautes, variantes de nom), ou null si aucun plat ne correspond ou si c'est une boisson/un supplément sans fiche. Ne devine pas au hasard.
+Réponds uniquement avec un objet JSON {"libellé": "id" | null}.`, { modelTier: "quick" });
+      for (const [k, v] of Object.entries(res || {})) if (v && S.recettes[v]) mapIA[k] = v;
+      for (const [plat, rid] of Object.entries(mapIA)) { const r = S.recettes[rid]; if (!(r.aliases||[]).includes(plat)) await patch("recettes", rid, { aliases: [...(r.aliases||[]), plat] }); }
+    } catch(e) { toast("Agent IA : " + errMsg(e)); }
+  }
+  const byDate = {};
+  for (const r of rows) (byDate[r.date] ||= []).push({ plat: r.plat, recetteId: matchRecette(r.plat) || mapIA[r.plat] || null, qte: r.qte, ca: r.ca });
+  for (const [d, lignes] of Object.entries(byDate)) await save("ventes", d, { date: d, lignes, source: "caisse", importedAt: new Date().toISOString() });
+  const nonRelies = new Set(Object.values(byDate).flat().filter(l=>!l.recetteId).map(l=>l.plat));
+  toast(`${rows.length} lignes importées sur ${Object.keys(byDate).length} jour(s)`);
+  if (msg) msg.textContent = nonRelies.size ? `Sans fiche technique : ${[...nonRelies].join(", ")}` : "Tous les plats sont reliés à une fiche.";
+}
+async function relierVentes(){
+  for (const v of Object.values(S.ventes)) {
+    let changed = false;
+    const lignes = (v.lignes||[]).map(l => { if (!l.recetteId) { const r = matchRecette(l.plat); if (r) { changed = true; return { ...l, recetteId: r }; } } return l; });
+    if (changed) await patch("ventes", v.id, { lignes });
+  }
+}
+
+/* ============ VIEW: consommation ============ */
+function vConso(){
+  const range = periodRange(), prix = prixProduits();
+  const { res, sansFiche } = consoTheorique(range);
+  const ent = entreesPeriode(range);
+  const aty = atypiques(), atyMap = Object.fromEntries(aty.list.map(a=>[a.pid,a]));
+  const weeks = aty.weeks, perWeek = weeks.map(w => consoTheorique([w, addDays(w,6)]).res);
+  const pids = [...new Set([...Object.keys(res), ...Object.keys(ent.res)])];
+  const rows = pids.map(pid => ({ pid, p:S.produits[pid], q:res[pid]||0, v:(res[pid]||0)*(prix[pid]?.pm||0), e:ent.res[pid]?.q||0, serie: perWeek.map(o=>o[pid]||0) })).sort((a,b)=>b.v-a.v);
+  const key = "conso-" + weeks[weeks.length-1];
+  return `${statusBanner()}
+  <div class="row between"><div><h2>Consommation théorique</h2><div class="muted small">${range[2]} · ventes × fiches techniques. Ce n'est pas un écart de stock réel (inventaire physique prévu en V2).</div></div>${periodSeg()}</div>
+  <section class="panel">
+    <header><div><h3>Consommations atypiques</h3><p>Semaine du ${fdate(weeks[weeks.length-1])} vs moyenne des semaines précédentes · seuil ±${Math.round(rules().seuilConso*100)} %</p></div><div class="roles"><span class="role sys">Détecte</span><span class="role ia">Analyse et explique</span></div></header>
+    ${atyTable(aty)}
+    ${analyseBlock(key, aty.list.length)}
+  </section>
+  <section class="panel">
+    <header><div><h3>Par produit</h3><p>Consommation théorique agrégée et entrées de stock sur la même période</p></div><span class="role sys">Système</span></header>
+    ${rows.length ? `<div class="tw"><table><thead><tr><th>Produit</th><th>6 semaines</th><th class="r">Conso. théorique</th><th class="r">Valeur</th><th class="r">Entrées factures</th><th class="r">Conso / entrées</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.p?.nom||r.pid)} ${atyMap[r.pid]?`<span class="pill warn">atypique</span>`:""}</td><td>${spark(r.serie, !!atyMap[r.pid])}</td><td class="r">${nf(r.q)} ${esc(r.p?.unite||"")}</td><td class="r">${eur(r.v)}</td><td class="r">${r.e?nf(r.e)+" "+esc(r.p?.unite||""):"—"}</td><td class="r">${r.e?pct(r.q/r.e,0):"—"}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">Importez des ventes et créez des fiches techniques pour calculer la consommation.</div>`}
+    ${Object.keys(sansFiche).length ? `<p class="small muted" style="margin:10px 0 0">Non comptés (plats sans fiche technique) : ${Object.entries(sansFiche).map(([p,q])=>`${esc(p)} × ${nf(q,0)}`).join(", ")}</p>` : ""}
+  </section>
+  <section class="panel">
+    <header><div><h3>Règles de détection</h3><p>Seuils utilisés par le système pour lever les alertes${can("seuils")?"":" · modifiables par le propriétaire uniquement"}</p></div><span class="role sys">Système</span></header>
+    <div class="fgrid">
+      ${[["seuilConso","Consommation atypique (écart)"],["seuilPrix","Variation de prix d'achat"],["seuilCalcul","Écart calcul ligne facture"],["seuilTotal","Écart total facture"]].map(([k,l]) => `<div class="field"><label for="rule-${k}">${l} (%)</label><input type="number" id="rule-${k}" data-rule="${k}" min="0" step="1" value="${Math.round(rules()[k]*100)}" ${can("seuils")?"":"disabled"}></div>`).join("")}
+    </div>
+  </section>`;
+}
+async function analyserConso(key){
+  if (!sample) return;
+  const aty = atypiques(); if (!aty.list.length) return;
+  const weeks = aty.weeks, last = weeks[weeks.length-1];
+  const perWeekVentes = weeks.map(w => { const o = {}; for (const l of ventesLignes([w, addDays(w,6)])) { const n = l.recetteId ? S.recettes[l.recetteId]?.nom : l.plat; o[n] = (o[n]||0) + (+l.qte||0); } return { semaine: w, ventes: o }; });
+  const recettesUsant = Object.fromEntries(aty.list.map(a => [a.nom, Object.values(S.recettes).filter(r => (r.ingredients||[]).some(i=>i.produitId===a.pid)).map(r => ({ plat:r.nom, qte:(r.ingredients.find(i=>i.produitId===a.pid)||{}).qte, unite:(r.ingredients.find(i=>i.produitId===a.pid)||{}).unite, portions:r.portions, majFiche: r.updatedAt }))]));
+  const prompt = `Tu es l'agent IA d'analyse d'un portail de gestion de restaurant. Le système a détecté des consommations THÉORIQUES atypiques (ventes × fiches techniques) pour la semaine du ${last}.
+Explique au chef, pour chaque produit, ce qui provoque l'écart : quels plats vendus en plus ou en moins, modification récente d'une fiche technique, effet saisonnier ou événement possible, ou erreur de saisie probable (unité, quantité). Termine par 1 ou 2 vérifications concrètes à faire.
+Il n'y a pas d'inventaire physique : ne conclus jamais à une perte ou un vol, parle uniquement de consommation théorique.
+Réponds en français, texte simple sans markdown, 5 à 9 phrases.
+
+Produits atypiques : ${JSON.stringify(aty.list.map(a => ({ produit:a.nom, unite:a.unite, semaine:+a.cur.toFixed(3), moyennePrecedente:+a.moy.toFixed(3), ecart: Math.round(a.ecart*100)+"%", serie6semaines:a.serie.map(x=>+x.toFixed(2)) })))}
+Plats utilisant ces produits : ${JSON.stringify(recettesUsant)}
+Ventes par semaine et par plat : ${JSON.stringify(perWeekVentes)}`;
+  UI.anaBusy[key] = true; scheduleRender();
+  try {
+    const { text } = await sample(prompt, { modelTier: "default", cache: false, onText: ({ text }) => { UI.anaBusy[key] = text; const el = document.getElementById("ana-live-" + key); if (el) el.innerHTML = `<span class="h">Agent IA</span>` + esc(text); } });
+    await save("analyses", key, { texte: text.trim(), createdAt: new Date().toISOString(), type: "consommation" });
+  } catch(e) { toast("Analyse IA : " + errMsg(e)); }
+  finally { delete UI.anaBusy[key]; scheduleRender(); }
+}
+
+/* ============ VIEW: accès (propriétaire) ============ */
+const NAMES = {};
+function resolveNames(ids){
+  if (!userApi || !ids.length) return;
+  const miss = ids.filter(id => !(id in NAMES));
+  if (!miss.length) return;
+  miss.forEach(id => NAMES[id] = "");
+  userApi.profiles(miss).then(ps => { let ch = false; for (const [id,p] of Object.entries(ps)) { const v = p.name ? p.name + (p.email ? " · " + p.email : "") : ""; if (NAMES[id] !== v) { NAMES[id] = v; ch = true; } } if (ch) scheduleRender(); }).catch(() => {});
+}
+const who = id => id === "proprietaire" ? "Propriétaire" : (NAMES[id] || "Utilisateur " + String(id).slice(-4));
+function vAcces(){
+  const ids = [...new Set([...Object.keys(S.membres), ...Object.keys(S.roles)])].filter(id => id !== ME);
+  const jr = Object.values(S.journal).sort((a,b) => (b.at||"").localeCompare(a.at||"")).slice(0, 60);
+  resolveNames([...ids, ...jr.map(j => j.acteur).filter(a => a && a !== "proprietaire"), ...jr.filter(j=>j.action==="Rôle modifié").map(j=>j.cible)]);
+  return `
+  <div class="row between"><div><h2>Accès et rôles</h2><div class="muted small">Toi seule es propriétaire : tu fais évoluer et publies l'agent. Les rôles ci-dessous règlent ce que chaque utilisateur peut faire.</div></div></div>
+  <section class="panel">
+    <header><div><h3>Rôles disponibles</h3><p>Une personne invitée arrive « En attente » jusqu'à ce que tu lui attribues un rôle.</p></div></header>
+    <div class="tw"><table><thead><tr><th>Rôle</th><th>Ce qu'il permet</th><th>Déposer</th><th>Doublons</th><th>Supprimer</th><th>Fiches</th><th>Caisse</th><th>Tableau de bord</th></tr></thead><tbody>
+    ${["proprietaire", ...ROLE_ORDER].map(k => { const r = ROLES[k], y = p => r.perms.includes(p) ? "✓" : "—";
+      return `<tr><td><b>${r.label}</b></td><td class="small">${esc(r.desc)}</td><td>${y("deposer")}</td><td>${y("doublons")}</td><td>${y("supprimer")}</td><td>${y("fiches")}</td><td>${y("caisse")}</td><td>${y("voir")}</td></tr>`; }).join("")}
+    </tbody></table></div>
+  </section>
+  <section class="panel">
+    <header><div><h3>Utilisateurs</h3><p>Personnes qui ont ouvert le portail après ton partage (menu Partager → rôle Contributeur).</p></div></header>
+    ${ids.length ? `<div class="tw"><table><thead><tr><th>Personne</th><th>Dernière visite</th><th>Rôle</th></tr></thead><tbody>
+      ${ids.map(id => `<tr><td>${esc(who(id))}</td><td class="small muted">${S.membres[id]?.derniereVisite ? new Date(S.membres[id].derniereVisite).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"}) : "—"}</td>
+        <td><select id="role-${esc(id)}" data-role-for="${esc(id)}" aria-label="Rôle">${ROLE_ORDER.map(k => `<option value="${k}" ${(S.roles[id]?.role||"attente")===k?"selected":""}>${ROLES[k].label}</option>`).join("")}</select></td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">Personne n'a encore ouvert le portail. Partage-le depuis le menu Partager avec le rôle <b>Contributeur</b> ; chaque personne apparaîtra ici à sa première visite.</div>`}
+  </section>
+  <section class="panel">
+    <header><div><h3>Journal des actions sensibles</h3><p>Suppressions, doublons intégrés, changements de rôle</p></div></header>
+    ${jr.length ? `<div class="tw"><table><thead><tr><th>Date</th><th>Qui</th><th>Action</th><th>Sur</th><th>Détail</th></tr></thead><tbody>
+      ${jr.map(j => `<tr><td class="small">${new Date(j.at).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}</td><td>${esc(who(j.acteur))} <span class="small muted">${esc(ROLES[j.role]?.label||"")}</span></td><td>${esc(j.action)}</td><td>${esc(j.action==="Rôle modifié" ? who(j.cible) : j.cible)}</td><td class="small">${esc(j.detail)}</td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="empty">Aucune action sensible pour l'instant.</div>`}
+  </section>`;
+}
+
+/* ============ events ============ */
+document.addEventListener("click", async e => {
+  const t = e.target.closest("button, tr.click, [data-goto]"); if (!t) return;
+  if (t.dataset.tab) { UI.tab = t.dataset.tab; UI.openFacture = null; UI.confirmDel = null; try { localStorage.setItem("bs-tab", UI.tab); } catch(_) {} render(); window.scrollTo(0,0); return; }
+  if (t.dataset.goto) { UI.tab = t.dataset.goto; render(); window.scrollTo(0,0); return; }
+  if (t.dataset.period) { UI.period = t.dataset.period; UI.grain = null; try { localStorage.setItem("bs-period", UI.period); } catch(_) {} render(); return; }
+  if (t.dataset.fac) { UI.openFacture = UI.openFacture === t.dataset.fac ? null : t.dataset.fac; UI.confirmDel = null; render(); return; }
+  if (t.dataset.del && can("supprimer")) { UI.confirmDel = t.dataset.del; render(); return; }
+  if ("delNo" in t.dataset) { UI.confirmDel = null; render(); return; }
+  if (t.dataset.delYes && can("supprimer")) { const id = t.dataset.delYes; const f = S.factures[id] || {}; UI.confirmDel = null; UI.openFacture = null; await remove("entrees", id); await remove("factures", id); journal("Suppression facture", `${f.fournisseur||""} n° ${f.numero||""}`, f.totalHT != null ? eur(+f.totalHT) + " HT" : ""); toast("Facture supprimée"); return; }
+  if (t.dataset.force && can("doublons")) { const id = t.dataset.force; journal("Doublon intégré", `${S.factures[id]?.fournisseur||""} n° ${S.factures[id]?.numero||""}`, ""); await patch("factures", id, { statut:"traitee", alertes:(S.factures[id].alertes||[]).map(a=>a.type==="Doublon"?{...a, niveau:"warn", message:a.message.replace("Aucune entrée de stock créée.","Intégrée manuellement.")}:a) }); if ((S.factures[id].lignes||[]).length) await creerEntrees(id); toast("Facture intégrée au stock"); return; }
+  if ("demoClear" in t.dataset && can("demo")) { UI.confirmDemo = true; render(); return; }
+  if ("demoNo" in t.dataset) { UI.confirmDemo = false; render(); return; }
+  if ("demoYes" in t.dataset && can("demo")) { UI.confirmDemo = false; for (const c of COLS) for (const d of Object.values(S[c])) if (d.demo) await remove(c, d.id); toast("Données d'exemple effacées"); return; }
+  if ("retryErr" in t.dataset && can("deposer")) { relancerEchecs(); return; }
+  if ("suspend" in t.dataset) { suspendre("manuel"); return; }
+  if ("resume" in t.dataset && can("deposer")) { reprendre(); return; }
+  if ("lancerIa" in t.dataset && can("deposer")) { lancerLecture(); return; }
+  if ("clearQueue" in t.dataset) { UI.queue = UI.queue.filter(q => q.state === "wait" || q.state === "run" || q.state === "lu_attente"); setQ({}, {}); return; }
+  if (t.dataset.anaFac && can("analyser")) { analyserFacture(t.dataset.anaFac); return; }
+  if (t.dataset.analyse && can("analyser")) { analyserConso(t.dataset.analyse); return; }
+  if ("newRecette" in t.dataset && can("fiches")) { UI.editRecette = { nom:"", portions:1, ingredients:[], allergenes:[] }; UI.confirmDel = null; render(); $("#rf-nom")?.focus(); return; }
+  if (t.dataset.editRecette && can("fiches")) { UI.editRecette = JSON.parse(JSON.stringify(S.recettes[t.dataset.editRecette])); UI.confirmDel = null; render(); $("#recette-editor")?.scrollIntoView({ behavior:"smooth", block:"start" }); return; }
+  if (t.id === "csv-go" && can("caisse")) { await importerVentes(parseCaisse($("#csv-txt").value)); return; }
+});
+document.getElementById("version-btn").addEventListener("click", e => { const v = document.getElementById("versions"); v.hidden = !v.hidden; e.currentTarget.setAttribute("aria-expanded", String(!v.hidden)); });
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.matches("tr.click")) e.target.click(); });
+document.addEventListener("change", async e => {
+  const t = e.target;
+  if (t.dataset.roleFor && can("roles")) { const id = t.dataset.roleFor, role = t.value, avant = S.roles[id]?.role || "attente";
+    await save("roles", id, { role, attribuePar: ME || "proprietaire", at: new Date().toISOString() });
+    journal("Rôle modifié", id, `${ROLES[avant]?.label||avant} → ${ROLES[role].label}`); toast("Rôle enregistré"); return; }
+  if (t.id === "file-in" && can("deposer")) { const files = [...t.files]; t.value = ""; importerFichiers(files); return; }
+  if (t.id === "csv-in" && can("caisse")) { const f = t.files[0]; t.value = ""; if (f) await importerVentes(parseCaisse(await f.text())); return; }
+  if (t.dataset.facDate && can("deposer")) { const id = t.dataset.facDate, d = t.value, f = S.factures[id]; if (!f || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+    await patch("factures", id, { date: d, dateProvisoire: false, alertes: (f.alertes||[]).filter(a => a.type !== "Date") });
+    if (S.entrees[id]) await patch("entrees", id, { date: d });
+    journal("Date facture corrigée", `${f.fournisseur||""} n° ${f.numero||""}`, `${fdate(f.date)} → ${fdate(d)}`); toast("Date du document mise à jour"); return; }
+  if (t.dataset.reglage) { const k = t.dataset.reglage; setReglage(k, t.type === "checkbox" ? t.checked : k === "parallele" ? +t.value : t.value); if (k === "parallele") pomper(); toast("Réglage d'import enregistré"); return; }
+  if (t.dataset.rule && can("seuils")) { const v = Math.max(0, parseFloat(t.value)||0)/100; await save("config", "regles", { ...rules(), [t.dataset.rule]: v }); toast("Règle mise à jour"); return; }
+});
+["dragenter","dragover"].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest?.("#drop"); if (d) { e.preventDefault(); d.classList.add("over"); } }));
+["dragleave","drop"].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest?.("#drop"); if (d) { e.preventDefault(); d.classList.remove("over"); } }));
+document.addEventListener("drop", async e => { if (!e.target.closest?.("#drop") || !can("deposer")) return; e.preventDefault(); importerFichiers(e.dataTransfer?.files || []); });
+
+/* ============ boot ============ */
+let lectureAutoFaite = false;
+render();
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  const [d, s, a] = await Promise.all([claude.use("db"), claude.use("sample"), claude.use("assets")].map(p => p.catch(() => null)));
+  sample = s; assets = a;
+  try {
+    const u = await claude.use("user");
+    if (u) {
+      userApi = u;
+      const me = await u.me();
+      OWNER = !!me.isOwner; ME = me.id; ROLE_KNOWN = true;
+    } else NO_IDENTITY = true;
+  } catch(_) { NO_IDENTITY = true; }
+  ROLE_PENDING = false;
+  if (sample) { try { sampleLimits = await sample.limits(); } catch(_) {} }
+  if (d) {
+    db = d; liveDb = true;
+    for (const c of COLS) db.collection(c).onSnapshot(snap => {
+      const o = {}; snap.docs.forEach(doc => { o[doc.id] = { id: doc.id, ...doc.data() }; });
+      S[c] = o; scheduleRender();
+      if (c === "factures" && !lectureAutoFaite && sample && can("deposer") && regl().auto && Object.values(o).some(f => f.statut === "a_lire" && !f.erreurLecture)) {
+        lectureAutoFaite = true; setTimeout(() => { lancerLecture(); toast("Lecture IA automatique des factures en attente"); }, 1500);
+      }
+    }, err => console.warn(c, err));
+    // chaque personne qui ouvre le portail apparaît dans l'onglet Accès du propriétaire
+    if (ME && !OWNER) { try { await db.collection("membres").doc(ME).set({ derniereVisite: new Date().toISOString() }); } catch(e) { console.warn(e); } }
+  }
+  scheduleRender();
+})();
+})();
+</script>
+
+</body></html>
