@@ -198,7 +198,7 @@ footer.legend-wbs > div{display:flex;gap:8px;align-items:center}
   <header class="top">
     <div class="brand">
       <div>
-        <h1>Brigade Stock <button type="button" class="version" id="version-btn" aria-expanded="false" title="Historique des versions">V0.18</button></h1>
+        <h1>Brigade Stock <button type="button" class="version" id="version-btn" aria-expanded="false" title="Historique des versions">V0.19</button></h1>
         <div class="sub">Portail V1 · factures, stock théorique, fiches techniques, food cost</div>
       </div>
       <div class="chain" aria-label="Chaîne fonctionnelle V1">
@@ -210,6 +210,7 @@ footer.legend-wbs > div{display:flex;gap:8px;align-items:center}
   <section class="panel" id="versions" hidden style="margin-top:14px">
     <header><div><h3>Historique des versions</h3><p>Versions mineures V0.x : une par modification publiée. Le passage à une version majeure (V1.0) est décidé par la propriétaire.</p></div></header>
     <ol class="vlist" reversed>
+      <li><b>V0.19</b> Initialisation depuis l'export METRO (Excel, ODS, CSV) ; contenance calculée depuis la désignation (5KG, 500G, 6X150G…) ; réglages d'import en configuration serveur ; suivi d'import simplifié</li>
       <li><b>V0.18</b> Analyse IA des alertes en parallèle de la lecture ; lecture automatique des factures en attente à l'ouverture</li>
       <li><b>V0.17</b> Graphique : 7 j par jour (lundi…), 30 j par semaine (Semaine 1…), trimestre Mois 1 à 3, année janvier à décembre ; période « Semaine » retirée</li>
       <li><b>V0.16</b> Numérotation des versions et historique</li>
@@ -311,6 +312,7 @@ const eur = (n, d=2) => (isFinite(n) ? n : 0).toLocaleString("fr-FR", { style:"c
 const nf = (n, d=2) => (isFinite(n) ? n : 0).toLocaleString("fr-FR", { maximumFractionDigits:d, minimumFractionDigits:0 });
 const pct = (n, d=1) => isFinite(n) ? (n*100).toLocaleString("fr-FR",{maximumFractionDigits:d, minimumFractionDigits:d}) + " %" : "—";
 const uid = p => p + "_" + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-3);
+const numCle = n => { const d = String(n||"").match(/\d+/g) || []; return d.length >= 2 ? d.slice(-2).join("/") : d.join("/"); };   // "0/0(064)0051/038478" = "0/0/0051/038478"
 const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 const normUnit = u => { let n = norm(u).replace(/\s/g,""); if (STD[n]) return n; if (n.endsWith("s") && STD[n.slice(0,-1)]) return n.slice(0,-1); return n; };
 const iso = d => { const x = new Date(d); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
@@ -670,14 +672,14 @@ function vFactures(){
       <strong>Déposer une ou plusieurs factures ici</strong>
       <span class="muted small">${sampleLimits && !sampleLimits.images ? "PDF numériques des fournisseurs · les photos et scans ne sont pas lisibles dans cette vue" : "Photos (JPG, PNG, WebP) ou PDF"} · import en masse accepté</span>
       <span class="btn primary sm">Choisir des fichiers</span>
-      <span class="muted small">Sélection multiple (Maj ou Cmd/Ctrl + clic), glisser-déposer d'un lot, ou une archive <b>ZIP</b> de centaines de PDF · gardez la page ouverte pendant l'import</span>
+      <span class="muted small">Chaque facture est importée, lue par l'agent IA, contrôlée puis intégrée au stock, sans autre action</span>
     </label>
     <input type="file" id="file-in" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf,.pdf,.zip,application/zip,application/x-zip-compressed" hidden>`
     : `<div class="banner warn">L'agent IA n'est pas disponible dans cette vue : la lecture automatique des factures est désactivée.</div>`}
-    ${sample && can("deposer") ? reglagesHtml() : ""}
     <div class="queue" id="queue">${queueHtml()}</div>
   </section>
 
+  ${initHtml()}
   <section class="panel">
     <header><div><h3>Factures importées</h3><p>${list.length} document${list.length>1?"s":""} · cliquez sur une ligne pour le détail</p></div></header>
     ${list.length ? `<div class="tw"><table><thead><tr><th>Statut</th><th>Fournisseur</th><th>N°</th><th>Date facture</th><th class="r">Lignes</th><th class="r">Total HT</th><th>Importée le</th></tr></thead><tbody>
@@ -688,37 +690,30 @@ function vFactures(){
 }
 function qItem(q){
   const steps = [["import","Import"],["hash","Doublons"],["stock","Stockage"],["texte","Texte"],["ia","Lecture IA"],["ctrl","Contrôles"],["entree","Entrées stock"],["ana","Analyse IA"]];
-  return `<div class="qitem"><div><b>${esc(q.name)}</b>${q.source ? ` <span class="small muted">· ${esc(q.source)}</span>` : ""} <span class="muted small">${esc(q.msg||"")}</span></div><div>${q.state==="done"?`<span class="pill ok">Terminé</span>`:q.state==="err"?`<span class="pill crit">Échec</span>`:q.state==="dup"?`<span class="pill crit">Doublon</span>`:q.state==="wait"?`<span class="pill info">En attente</span>`:q.state==="lu_attente"?`<span class="pill info">Importée · IA en attente</span>`:`<span class="pill ia">En cours</span>`}</div>
+  return `<div class="qitem"><div><b>${esc(q.name)}</b>${q.source ? ` <span class="small muted">· ${esc(q.source)}</span>` : ""} <span class="muted small">${esc(q.msg||"")}</span></div><div>${q.state==="done"?`<span class="pill ok">Terminé</span>`:q.state==="err"?`<span class="pill crit">Échec</span>`:q.state==="dup"?`<span class="pill crit">Doublon</span>`:q.state==="wait"?`<span class="pill info">En attente</span>`:q.state==="lu_attente"?`<span class="pill ia">En cours</span>`:`<span class="pill ia">En cours</span>`}</div>
   <div class="steps">${steps.filter(([k])=>q.steps[k]).map(([k,l]) => `<span class="step ${q.steps[k]}">${l}</span>`).join("")}</div></div>`;
 }
 function queueHtml(){
   const aLire = Object.values(S.factures).filter(f => f.statut === "a_lire");
   const enFile = new Set(UI.queue.filter(q => q.fid && (q.state === "lu_attente" || q.state === "run")).map(q => q.fid));
   const orphelines = aLire.filter(f => !enFile.has(f.id)).length;
-  const lancer = orphelines && sample && can("deposer") ? `<div class="banner info row between"><span><b>${orphelines} facture${orphelines>1?"s":""} importée${orphelines>1?"s":""}</b> en attente de lecture par l'agent IA.</span><button class="btn primary sm" data-lancer-ia>Lancer la lecture IA</button></div>` : "";
+  const lancer = orphelines && sample && can("deposer") ? `<div class="banner info row between"><span><b>${orphelines} facture${orphelines>1?"s":""}</b> en attente de lecture par l'agent IA.</span><button class="btn primary sm" data-lancer-ia>Lire maintenant</button></div>` : "";
   if (!UI.queue.length) return lancer;
   const n = k => UI.queue.filter(q => q.state === k).length;
-  const total = UI.queue.length;
-  const imp = UI.queue.filter(q => q.phase !== "import" || ["dup","err"].includes(q.state)).length;       // import terminé (ou écarté)
-  const iaTot = UI.queue.filter(q => q.phase === "ia").length, iaFini = UI.queue.filter(q => q.phase === "ia" && ["done","dup","err"].includes(q.state)).length;
-  const iaRun = UI.queue.filter(q => q.phase === "ia" && q.state === "run").length, impRun = UI.queue.filter(q => q.phase === "import" && q.state === "run").length;
-  const err = n("err"), actifs = n("run") + n("wait") + n("lu_attente");
-  const pause = UI.pause && (n("lu_attente") || iaRun) ? `<div class="banner warn row between"><span>${UI.pause === "limite" ? "Lecture IA en pause : la limite d'utilisation de l'agent IA est atteinte. Reprenez dans quelques minutes (ou plus tard si votre quota est épuisé)." : UI.pause === "session" ? "Lecture IA en pause : reconnectez-vous à claude.ai puis reprenez." : "Lecture IA suspendue."} Les factures importées restent enregistrées « à lire ».</span><button class="btn primary sm" data-resume>Reprendre</button></div>` : "";
-  const barre = (v, t, col) => `<div style="height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;flex:1;min-width:80px"><div style="height:100%;width:${t ? (v/t*100).toFixed(1) : 0}%;background:${col}"></div></div>`;
-  const resume = lancer + pause + `<div class="row between small">
-    <span class="row" style="gap:8px;flex:1;min-width:220px"><b style="white-space:nowrap">Import ${imp}/${total}</b>${barre(imp, total, "var(--accent)")}${impRun ? `<span class="muted">${impRun} en cours</span>` : ""}</span>
-    <span class="row" style="gap:8px;flex:1;min-width:220px"><b style="white-space:nowrap">Lecture IA ${iaFini}/${iaTot}</b>${barre(iaFini, iaTot, "var(--ia)")}${iaRun ? `<span class="muted">${iaRun} en cours</span>` : ""}</span></div>
-    <div class="row between small"><span>${n("done")} intégrée${n("done")>1?"s":""}${n("dup")?` · ${n("dup")} doublon${n("dup")>1?"s":""}`:""}${err?` · <span style="color:var(--crit)">${err} échec${err>1?"s":""}</span>`:""}</span>
-    <span class="row">${err && can("deposer") ? `<button class="btn sm" data-retry-err>Relancer les échecs</button>` : ""}${(n("lu_attente") || iaRun) && !UI.pause ? `<button class="btn ghost sm" data-suspend>Suspendre la lecture IA</button>` : ""}${!actifs ? `<button class="btn ghost sm" data-clear-queue>Vider la liste</button>` : ""}</span></div>`;
+  const total = UI.queue.length, fini = n("done") + n("dup") + n("err"), err = n("err"), actifs = total - fini;
+  const pause = UI.pause && actifs ? `<div class="banner warn row between"><span>${UI.pause === "limite" ? "Lecture en pause : la limite d'utilisation de l'agent IA est atteinte. Reprenez dans quelques minutes." : UI.pause === "session" ? "Lecture en pause : reconnectez-vous à claude.ai puis reprenez." : "Lecture suspendue."} Les factures restent enregistrées « en attente ».</span><button class="btn primary sm" data-resume>Reprendre</button></div>` : "";
+  const barre = total > 1 ? `<div style="height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden"><div style="height:100%;width:${(fini/total*100).toFixed(1)}%;background:var(--accent)"></div></div>` : "";
+  const resume = lancer + pause + `<div class="row between small"><span><b>${fini}/${total}</b> facture${total>1?"s":""} traitée${fini>1?"s":""} · ${n("done")} intégrée${n("done")>1?"s":""}${n("dup")?` · ${n("dup")} doublon${n("dup")>1?"s":""}`:""}${err?` · <span style="color:var(--crit)">${err} échec${err>1?"s":""}</span>`:""}${actifs?` · <span class="muted">${actifs} en cours</span>`:""}</span>
+    <span class="row">${err && can("deposer") ? `<button class="btn sm" data-retry-err>Relancer les échecs</button>` : ""}${!actifs ? `<button class="btn ghost sm" data-clear-queue>Vider la liste</button>` : ""}</span></div>`;
   let liste = UI.queue, masques = "";
   if (total > 40) {
     const run = UI.queue.filter(q => q.state === "run"), echecs = UI.queue.filter(q => q.state === "err"),
       wait = UI.queue.filter(q => q.state === "wait" || q.state === "lu_attente"), finis = UI.queue.filter(q => q.state === "done" || q.state === "dup");
     liste = [...run, ...echecs, ...wait.slice(0, 5), ...finis.slice(0, 20)];
     const cache = total - liste.length;
-    if (cache) masques = `<div class="small muted" style="text-align:center">${cache} autre${cache>1?"s":""} fichier${cache>1?"s":""} non affiché${cache>1?"s":""} (${Math.max(0, wait.length-5)} en attente, ${Math.max(0, finis.length-20)} terminés plus anciens)</div>`;
+    if (cache) masques = `<div class="small muted" style="text-align:center">${cache} autre${cache>1?"s":""} fichier${cache>1?"s":""} non affiché${cache>1?"s":""}</div>`;
   }
-  return resume + liste.map(qItem).join("") + masques;
+  return resume + barre + liste.map(qItem).join("") + masques;
 }
 function factureDetail(f){
   const prix = prixProduits();
@@ -743,6 +738,123 @@ function factureDetail(f){
     </div>
   </div>`;
 }
+
+/* ============ INITIALISATION DEPUIS L'EXPORT METRO (Excel / ODS / CSV) ============
+   Données exactes de METRO (une ligne par article facturé) : factures, produits et entrées de stock sont créés
+   sans IA. La contenance vient de la désignation ; les articles pesés sont convertis avec le prix au kg. */
+let xlsxReady = null;
+function ensureXlsx(){ return xlsxReady ||= loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js").then(() => window.XLSX); }
+const COLS_METRO = { facture:"n de facture", date:"date de facture", article:"n de l article", ean:"ean", desc:"description de l article",
+  ppk:"prix pc kg", nb:"nombre par unite metro", pu:"prix vente d unite ht", qte:"quantite", ht:"prix ht", tva:"tva", ttc:"prix ttc", ttcRemise:"prix ttc avec remise", groupe:"groupe d articles" };
+const CATEG_GROUPE = g => g < 200 ? null : g < 210 ? "Boulangerie" : g < 220 ? "Crèmerie" : g < 240 ? "Fromagerie" : g < 250 ? "Épicerie" : g < 260 ? "Poissonnerie"
+  : g < 270 ? "Surgelés" : g < 300 ? "Charcuterie" : g < 350 ? "Boucherie" : g < 354 ? "Poissonnerie" : g < 360 ? "Fruits & légumes" : g < 420 ? "Épicerie" : g < 480 ? "Boissons" : null;
+const nonAlimentaire = g => g < 200 || g >= 480;
+async function lireExportMetro(file){
+  const X = await ensureXlsx();
+  const wb = X.read(await file.arrayBuffer(), { type: "array" });
+  const nomF = wb.SheetNames.find(n => /article/i.test(n)) || wb.SheetNames[0];
+  const grille = X.utils.sheet_to_json(wb.Sheets[nomF], { header: 1, raw: true, defval: null });
+  const iH = grille.findIndex(r => r && r.some(c => norm(c) === COLS_METRO.facture) && r.some(c => norm(c) === COLS_METRO.desc));
+  if (iH < 0) throw new Error("colonnes METRO introuvables (« N° de facture », « Description de l'article »…)");
+  const H = grille[iH].map(c => norm(c)), col = {};
+  for (const [k, lib] of Object.entries(COLS_METRO)) col[k] = H.indexOf(lib);
+  const manque = ["facture","date","desc","qte","ht"].filter(k => col[k] < 0);
+  if (manque.length) throw new Error("colonnes manquantes : " + manque.join(", "));
+  const val = (r, k) => col[k] >= 0 ? r[col[k]] : null, num = (r, k) => parseNum(val(r, k));
+  const factures = {};
+  for (const r of grille.slice(iH + 1)) {
+    if (!r || !val(r, "facture") || !val(r, "desc")) continue;
+    const nf = String(val(r, "facture")).trim(), cle = numCle(nf);
+    const d = val(r, "date"), date = typeof d === "number" ? iso(new Date(Math.round((d - 25569) * 864e5))) : parseDate(d);
+    const f = factures[cle] ||= { numero: nf, date, lignes: [] };
+    f.lignes.push({ ref: String(val(r, "article") || "").replace(/^0+/, ""), ean: String(val(r, "ean") || ""), desc: String(val(r, "desc")).replace(/\s+/g, " ").trim(),
+      ppk: num(r, "ppk"), nb: num(r, "nb") || 1, pu: num(r, "pu"), qte: num(r, "qte"), ht: num(r, "ht"),
+      ttc: col.ttcRemise >= 0 && val(r, "ttcRemise") != null ? num(r, "ttcRemise") : num(r, "ttc"), groupe: parseInt(val(r, "groupe")) || 0 });
+  }
+  return Object.values(factures).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+}
+/* quantité en unité de stock d'une ligne de l'export */
+function quantiteStock(l){
+  const c = contenance(l.desc);
+  if (estPese(l.desc) || (l.qte === 0 && l.ppk > 0)) return { unite: "kg", qteBase: l.ppk > 0 ? l.ht / l.ppk : l.qte, note: "pesé" };
+  if (c) {
+    if (l.nb > 1 && Math.abs(l.nb - c.lot) < 1e-6) return { unite: c.unite, qteBase: l.qte * c.lot };          // bidon 5 L : nb = 5 (litres)
+    if (c.n > 1 && l.nb === c.n) return { unite: c.unite, qteBase: l.qte * l.nb * c.piece };                  // 6X150G vendu par 6
+    return { unite: c.unite, qteBase: l.qte * l.nb * c.lot };
+  }
+  return { unite: "pc", qteBase: l.qte * l.nb };
+}
+function apercuExport(facts){
+  const cles = new Map(Object.values(S.factures).filter(f => f.statut !== "doublon").map(f => [numCle(f.numero), f]));
+  const n = facts.reduce((a, f) => a + f.lignes.length, 0), ht = facts.reduce((a, f) => a + f.lignes.reduce((s, l) => s + l.ht, 0), 0);
+  const deja = facts.filter(f => cles.has(numCle(f.numero)));
+  return { n, ht, deja: deja.length, dejaPdf: deja.filter(f => cles.get(numCle(f.numero)).source !== "export_metro").length, debut: facts[0]?.date, fin: facts[facts.length-1]?.date, cles };
+}
+async function importerExportMetro(facts, remplacer, nomFichier){
+  const { cles } = apercuExport(facts);
+  const msg = t => { UI.initMsg = t; const el = $("#init-msg"); if (el) el.textContent = t; };
+  const parRef = new Map(Object.values(S.produits).filter(p => p.refMetro).map(p => [String(p.refMetro), p.id]));
+  let crees = 0, remplacees = 0, ignorees = 0, nProd = 0;
+  const importedAt = new Date().toISOString();
+  for (const [i, f] of facts.entries()) {
+    msg(`Import ${i + 1}/${facts.length} : facture ${f.numero}…`);
+    const old = cles.get(numCle(f.numero));
+    if (old) {
+      if (!remplacer || old.source === "export_metro") { ignorees++; continue; }
+      await remove("entrees", old.id); await remove("factures", old.id); remplacees++;
+    }
+    const lignes = [], autres = [];
+    for (const l of f.lignes) {
+      if (nonAlimentaire(l.groupe)) { autres.push({ libelle: l.desc, type: "non_alimentaire", total: l.ht }); continue; }
+      const q = quantiteStock(l);
+      let pid = l.ref && parRef.get(l.ref);
+      if (!pid) { const ex = Object.values(S.produits).find(p => !p.demo && norm(p.nom) === norm(l.desc) && p.unite === q.unite); if (ex) pid = ex.id; }
+      if (!pid) {
+        pid = uid("p"); nProd++;
+        await save("produits", pid, { nom: l.desc, unite: q.unite, categorie: CATEG_GROUPE(l.groupe) || "Divers", conversions: {}, refMetro: l.ref || null, ean: l.ean || null, createdAt: importedAt, source: "export_metro" });
+        if (l.ref) parRef.set(l.ref, pid);
+      }
+      const prod = S.produits[pid];
+      const qteBase = prod.unite === q.unite ? q.qteBase : l.qte * l.nb;
+      lignes.push({ libelle: l.desc, ref: l.ref, produitId: pid, qte: l.qte, unite: q.unite === "pc" ? "pc" : "unité", facteur: l.qte ? qteBase / l.qte : 1, qteBase, pu: l.pu, total: l.ht, puBase: qteBase ? l.ht / qteBase : 0, remise: 0 });
+    }
+    const totalHT = +f.lignes.reduce((a, l) => a + l.ht, 0).toFixed(2), totalTTC = +f.lignes.reduce((a, l) => a + (l.ttc || 0), 0).toFixed(2);
+    const fid = uid("f");
+    await save("factures", fid, { fournisseur: "METRO France", numero: f.numero, date: f.date, importedAt, source: "export_metro", fichier: { nom: nomFichier, type: "export" },
+      lignes, autres, totalHT, tva: +(totalTTC - totalHT).toFixed(2), totalTTC, statut: "traitee", alertes: [], analyseIA: "" });
+    if (lignes.length) await creerEntrees(fid);
+    crees++;
+  }
+  journal("Initialisation export METRO", nomFichier, `${crees} factures créées (${remplacees} remplaçant une lecture PDF), ${ignorees} ignorées, ${nProd} produits créés`);
+  msg(`Terminé : ${crees} factures importées${remplacees ? ` (dont ${remplacees} remplaçant la lecture PDF)` : ""}, ${ignorees} déjà présentes ignorées, ${nProd} nouveaux produits.`);
+  UI.initFacts = null; scheduleRender();
+}
+function initHtml(){
+  if (!can("supprimer")) return "";
+  const ap = UI.initFacts && apercuExport(UI.initFacts);
+  return `<section class="panel">
+    <header><div><h3>Initialisation depuis l'export METRO</h3><p>Fichier Excel, ODS ou CSV exporté depuis l'espace client METRO (une ligne par article). Données exactes, sans lecture IA.</p></div><span class="role sys">Système</span></header>
+    <div class="row"><label class="btn" for="init-in">Choisir l'export METRO</label><input type="file" id="init-in" accept=".xlsx,.xls,.ods,.csv,application/vnd.oasis.opendocument.spreadsheet,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden>
+      <span class="small muted" id="init-msg">${esc(UI.initMsg || "")}</span></div>
+    ${ap ? `<div class="note" style="margin-top:10px"><b>${UI.initFacts.length} factures</b> du ${fdate(ap.debut)} au ${fdate(ap.fin)} · ${nf(ap.n,0)} lignes · ${eur(ap.ht)} HT${ap.deja ? ` · ${ap.deja} déjà présente${ap.deja>1?"s":""} dans le portail` : ""}
+      ${ap.dejaPdf ? `<br><label class="row" style="gap:6px;margin-top:6px"><input type="checkbox" id="init-remplacer" checked> Remplacer les ${ap.dejaPdf} factures lues depuis les PDF par les données de l'export (plus fiables)</label>` : ""}
+      <div class="row" style="margin-top:8px"><button class="btn primary sm" data-init-go>Importer</button><button class="btn ghost sm" data-init-cancel>Annuler</button></div></div>` : ""}
+  </section>`;
+}
+/* ============ contenance lue dans la désignation (sans IA) ============
+   "FAR SACCOROSSO T00 W320 5KG" → 5 kg ; "BEURRE PLQ 500G" → 0,5 kg ; "FAISSELLE 6X150G" → pièce 0,15 kg, lot 0,9 kg ;
+   "HUILE 5L" → 5 L ; "RHUM 70CL" → 0,7 L. Les articles pesés (« ENV », « A PESER ») sont exclus : leur quantité est déjà en kg. */
+const UNITES_CONT = { KG:[1,"kg"], K:[1,"kg"], GRS:[.001,"kg"], GR:[.001,"kg"], G:[.001,"kg"], L:[1,"L"], LT:[1,"L"], CL:[.01,"L"], ML:[.001,"L"] };
+function contenance(desc){
+  const s = String(desc||"").toUpperCase().replace(/(\d),(\d)/g, "$1.$2");
+  let m = s.match(/(\d+)\s*[X*]\s*(\d+(?:\.\d+)?)\s*(KG|K|GRS|GR|G|LT|L|CL|ML)\b/), n = 1, v, u;
+  if (m) { n = +m[1]; v = +m[2]; u = m[3]; }
+  else { m = s.match(/(\d+(?:\.\d+)?)\s*(KG|K|GRS|GR|G|LT|L|CL|ML)\b/) || s.match(/(\d+(?:\.\d+)?)(K|G)(?=[A-Z])/); if (!m) return null; v = +m[1]; u = m[2]; }
+  const [f, base] = UNITES_CONT[u];
+  if (!(v > 0)) return null;
+  return { piece: v * f, lot: n * v * f, n, unite: base };
+}
+const estPese = d => /ENV\b|A PESER|\bVRAC\b/i.test(String(d||""));
 
 /* ============ invoice pipeline ============ */
 async function sha256(buf){ const h = await crypto.subtle.digest("SHA-256", buf); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join(""); }
@@ -867,6 +979,8 @@ const REGLES_LECTURE = `Règles de lecture (factures de grossistes et fournisseu
 - Si produitId est null, "nouveauProduit" : {"nom": nom générique court en français avec la précision utile (ex. "Mozzarella di bufala", "Coca-Cola 33 cl", "Tomates cerises"), "unite": "kg" | "L" | "pc", "categorie": "Crèmerie" | "Fromagerie" | "Charcuterie" | "Boucherie" | "Poissonnerie" | "Fruits & légumes" | "Herbes" | "Épicerie" | "Boissons" | "Surgelés"}.
   Unité de stock : kg pour ce qui se pèse (légumes, fromages, viandes, conserves en bocal, épices, pâtes) ; L pour huiles, sauces liquides, sirops, crème ; pc pour ce qui se compte (bouteilles et canettes de boisson, œufs, pièces, bottes, barquettes de germes).
 - Cohérence des unités (essentiel pour le prix de revient) : si "unite" vaut "kg" ou "L", "qte" est la quantité TOTALE en kg ou en L (2 sacs de farine 5 kg → qte 10, unite "kg", pu = prix au kg) et "facteurBase" vaut 1 ; sinon "qte" est un nombre d'articles et "facteurBase" la contenance d'UN article dans l'unité de stock du produit (mozzarella 150 g stockée en kg → 0.15 ; sac 5 kg → 5 ; bidon 10 L → 10). Contrôle final : total ÷ (qte × facteurBase) doit donner un prix réaliste par kg, L ou pièce (farine ≈ 1 à 2 €/kg, huile ≈ 2 €/L).
+- "ref" : numéro d'article du fournisseur s'il est imprimé (colonne « Numéro article » chez METRO), sinon "".
+- "nbPieces" : nombre total de pièces ou contenants achetés (sacs, pots, bidons, bouteilles, barquettes…) = colisage × quantité tel qu'imprimé ; 0 pour un article pesé.
 - "facteurBase" : nombre d'unités de stock dans UNE unité de "qte". Ex. "BOCAL 3KG" compté en unités → 3 ; "2X500GRS" → 1 ; "100GRS" → 0.1 ; "OEUFS X90" → 90 ; "BQ 8X100G" burrata en pc → 8 ; bidon "5L" → 5 ; poids en kg → 1 ; bouteille comptée en pc → 1.`;
 
 function pagePrompt(ctx){
@@ -894,7 +1008,7 @@ ${REGLES_LECTURE}
 
 Réponds uniquement avec ce JSON (champs d'en-tête et totaux à null s'ils ne figurent pas sur cette page) :
 {"fournisseur":null,"numero":null,"date":null,"totalHT":null,"tva":null,"totalTTC":null,
- "lignes":[{"libelle":"","qte":0,"unite":"","pu":0,"total":0,"remise":0,"produitId":null,"nouveauProduit":null,"facteurBase":1}],
+ "lignes":[{"libelle":"","ref":"","qte":0,"unite":"","nbPieces":0,"pu":0,"total":0,"remise":0,"produitId":null,"nouveauProduit":null,"facteurBase":1}],
  "autres":[{"libelle":"","type":"frais|consigne|non_alimentaire","total":0,"horsHT":false}],
  "lisibilite":"bonne|moyenne|faible"}`;
 }
@@ -991,23 +1105,10 @@ function setStep(q, k, v){ q.steps[k] = v; setQ(q, {}); }
 
 /* --- import en lot : tous les fichiers sont mis en file d'attente, 2 lectures IA en parallèle --- */
 /* Réglages d'import (mémorisés dans ce navigateur) */
-const REGLAGES_DEFAUT = { parallele: 3, mode: "standard", analyse2: true, auto: true };
-function reglages(){ try { return { ...REGLAGES_DEFAUT, ...JSON.parse(localStorage.getItem("bs-import") || "{}") }; } catch(_) { return { ...REGLAGES_DEFAUT }; } }
-function setReglage(k, v){ const r = { ...reglages(), [k]: v }; try { localStorage.setItem("bs-import", JSON.stringify(r)); } catch(_) {} REGL_MEM = r; }
-let REGL_MEM = null;
-const regl = () => REGL_MEM || (REGL_MEM = reglages());
-function reglagesHtml(){
-  const r = regl();
-  return `<div class="row small" style="margin-top:10px;gap:14px">
-    <label class="row" style="gap:6px">Lectures simultanées <select data-reglage="parallele" style="width:auto">${[1,2,3,4,6].map(n => `<option value="${n}" ${r.parallele==n?"selected":""}>${n}</option>`).join("")}</select></label>
-    <label class="row" style="gap:6px">Mode <select data-reglage="mode" style="width:auto">
-      <option value="rapide" ${r.mode==="rapide"?"selected":""}>Rapide : 1 demande par facture, modèle rapide</option>
-      <option value="standard" ${r.mode==="standard"?"selected":""}>Standard : 1 demande par facture</option>
-      <option value="precis" ${r.mode==="precis"?"selected":""}>Précis : page par page avec image</option></select></label>
-    <label class="row" style="gap:6px"><input type="checkbox" data-reglage="analyse2" ${r.analyse2?"checked":""}> Analyse IA des alertes en parallèle</label>
-    <label class="row" style="gap:6px"><input type="checkbox" data-reglage="auto" ${r.auto?"checked":""}> Lire automatiquement les factures en attente à l'ouverture</label>
-  </div>`;
-}
+/* Réglages d'import : configuration côté serveur (document config/import de la base, modifiable par la propriétaire
+   ou par Claude), pas d'interface à l'écran. Valeurs par défaut ci-dessous. */
+const REGLAGES_DEFAUT = { parallele: 2, mode: "standard", analyse: true, auto: true };
+const regl = () => { const { id, ...c } = S.config.import || {}; return { ...REGLAGES_DEFAUT, ...c }; };
 let verrou = Promise.resolve();
 function exclusif(fn){ const p = verrou.then(fn); verrou = p.catch(() => {}); return p; }   // contrôles + enregistrement, une facture à la fois
 const MIME = { pdf:"application/pdf", jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif" };
@@ -1177,6 +1278,7 @@ async function lireUne(q){
     const lignes = [];
     for (const l of ex.lignes) {
       let pid = l.produitId && S.produits[l.produitId] ? l.produitId : null;
+      if (l.ref) { const pr = Object.values(S.produits).find(p => p.refMetro && String(p.refMetro) === String(l.ref).replace(/^0+/, "")); if (pr) pid = pr.id; }
       if (!pid) {
         const np = l.nouveauProduit || { nom: l.libelle, unite: "pc", categorie: "Divers" };
         const exist = Object.values(S.produits).find(p => !p.demo && norm(p.nom) === norm(np.nom));
@@ -1185,7 +1287,13 @@ async function lireUne(q){
       }
       const prod = S.produits[pid];
       const nu = normUnit(l.unite);
-      const f = factor(prod, l.unite, +l.facteurBase);
+      let f = factor(prod, l.unite, +l.facteurBase);
+      // contenance lue dans le libellé : prioritaire sur l'estimation de l'IA pour les produits suivis au kg ou au litre
+      const cont = contenance(l.libelle), nbp = +l.nbPieces;
+      if (cont && prod && cont.unite === prod.unite && !estPese(l.libelle) && nbp > 0 && +l.qte > 0) {
+        const parPiece = cont.n > 1 && nbp % cont.n === 0 ? cont.piece : cont.lot;
+        f = nbp * parPiece / +l.qte;
+      }
       if (!STD[nu] && nu && !(prod.conversions||{})[nu] && +l.facteurBase > 0) await patch("produits", pid, { conversions: { ...(prod.conversions||{}), [nu]: +l.facteurBase } });
       const qte = +l.qte || 0, pu = +l.pu || 0, total = l.total != null ? +l.total : qte*pu;
       const qteBase = qte * f;
@@ -1206,7 +1314,7 @@ async function lireUne(q){
     const fn = norm(ex.fournisseur);
     for (const o of Object.values(S.factures)) {
       if (o.id === fid || o.statut === "doublon" || o.statut === "a_lire" || norm(o.fournisseur) !== fn) continue;
-      if (ex.numero && norm(o.numero) === norm(ex.numero)) { statut = "doublon"; doublonDe = o.id; alertes.unshift({ type:"Doublon", niveau:"crit", message:`Même fournisseur et même numéro que la facture importée le ${new Date(o.importedAt).toLocaleDateString("fr-FR")}. Aucune entrée de stock créée.` }); break; }
+      if (ex.numero && numCle(o.numero) === numCle(ex.numero)) { statut = "doublon"; doublonDe = o.id; alertes.unshift({ type:"Doublon", niveau:"crit", message:`Même fournisseur et même numéro que la facture importée le ${new Date(o.importedAt).toLocaleDateString("fr-FR")}. Aucune entrée de stock créée.` }); break; }
       const dd = Math.abs((new Date(o.date) - new Date(ex.date))/864e5);
       if (o.totalHT && ex.totalHT && Math.abs(o.totalHT - ex.totalHT) < 0.01 && dd <= 3) alertes.push({ type:"Doublon potentiel", niveau:"warn", message:`Montant identique (${eur(+ex.totalHT)}) à la facture ${o.numero} du ${fdate(o.date)} du même fournisseur.` });
     }
@@ -1218,7 +1326,7 @@ async function lireUne(q){
     return { alertes, statut, lignes };
     });
     FICHIERS.delete(fid);
-    if (alertes.length && regl().analyse2 && sample) { setStep(q, "ana", "wait"); fAna.push({ fid, q }); }   // analyse en parallèle, sans retarder la lecture suivante
+    if (alertes.length && regl().analyse && sample) { setStep(q, "ana", "wait"); fAna.push({ fid, q }); }   // analyse en parallèle, sans retarder la lecture suivante
     setQ(q, { state: statut === "doublon" ? "dup" : "done", msg: `${ex.fournisseur||""} · ${horsStock ? `hors stock uniquement (${ex.autres.length} ligne${ex.autres.length>1?"s":""} frais / non alimentaire)` : `${lignes.length} lignes`}${alertes.length?` · ${alertes.length} alerte${alertes.length>1?"s":""}`:""}` });
   } catch (e) {
     console.error(e);
@@ -1597,6 +1705,8 @@ document.addEventListener("click", async e => {
   if ("suspend" in t.dataset) { suspendre("manuel"); return; }
   if ("resume" in t.dataset && can("deposer")) { reprendre(); return; }
   if ("lancerIa" in t.dataset && can("deposer")) { lancerLecture(); return; }
+  if ("initCancel" in t.dataset) { UI.initFacts = null; UI.initMsg = ""; render(); return; }
+  if ("initGo" in t.dataset && can("supprimer") && UI.initFacts) { const rempl = !!$("#init-remplacer")?.checked; t.disabled = true; await importerExportMetro(UI.initFacts, rempl, UI.initNom || "export METRO"); return; }
   if ("clearQueue" in t.dataset) { UI.queue = UI.queue.filter(q => q.state === "wait" || q.state === "run" || q.state === "lu_attente"); setQ({}, {}); return; }
   if (t.dataset.anaFac && can("analyser")) { analyserFacture(t.dataset.anaFac); return; }
   if (t.dataset.analyse && can("analyser")) { analyserConso(t.dataset.analyse); return; }
@@ -1612,12 +1722,14 @@ document.addEventListener("change", async e => {
     await save("roles", id, { role, attribuePar: ME || "proprietaire", at: new Date().toISOString() });
     journal("Rôle modifié", id, `${ROLES[avant]?.label||avant} → ${ROLES[role].label}`); toast("Rôle enregistré"); return; }
   if (t.id === "file-in" && can("deposer")) { const files = [...t.files]; t.value = ""; importerFichiers(files); return; }
+  if (t.id === "init-in" && can("supprimer")) { const f = t.files[0]; t.value = ""; if (!f) return; UI.initMsg = "Lecture du fichier…"; render();
+    try { UI.initFacts = await lireExportMetro(f); UI.initNom = f.name; UI.initMsg = ""; } catch(e) { console.error(e); UI.initFacts = null; UI.initMsg = "Fichier non reconnu : " + (e.message || e); }
+    render(); return; }
   if (t.id === "csv-in" && can("caisse")) { const f = t.files[0]; t.value = ""; if (f) await importerVentes(parseCaisse(await f.text())); return; }
   if (t.dataset.facDate && can("deposer")) { const id = t.dataset.facDate, d = t.value, f = S.factures[id]; if (!f || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
     await patch("factures", id, { date: d, dateProvisoire: false, alertes: (f.alertes||[]).filter(a => a.type !== "Date") });
     if (S.entrees[id]) await patch("entrees", id, { date: d });
     journal("Date facture corrigée", `${f.fournisseur||""} n° ${f.numero||""}`, `${fdate(f.date)} → ${fdate(d)}`); toast("Date du document mise à jour"); return; }
-  if (t.dataset.reglage) { const k = t.dataset.reglage; setReglage(k, t.type === "checkbox" ? t.checked : k === "parallele" ? +t.value : t.value); if (k === "parallele") pomper(); toast("Réglage d'import enregistré"); return; }
   if (t.dataset.rule && can("seuils")) { const v = Math.max(0, parseFloat(t.value)||0)/100; await save("config", "regles", { ...rules(), [t.dataset.rule]: v }); toast("Règle mise à jour"); return; }
 });
 ["dragenter","dragover"].forEach(ev => document.addEventListener(ev, e => { const d = e.target.closest?.("#drop"); if (d) { e.preventDefault(); d.classList.add("over"); } }));

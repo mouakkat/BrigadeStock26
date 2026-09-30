@@ -6,12 +6,14 @@ entrées de stock, fiches techniques, ventes de caisse, consommation théorique 
 L'application est un artifact claude.ai : une seule page HTML (`brigade-stock.html`) qui s'appuie
 sur les capacités de la plateforme (agent IA `sample`, base partagée `db`, stockage `assets`, `user`).
 
-- Version courante : **V0.18** (historique dans l'application, bouton de version à côté du titre).
+- Version courante : **V0.19** (historique dans l'application, bouton de version à côté du titre).
 - Versions mineures V0.x : une par modification publiée ; le passage en version majeure est décidé par la propriétaire.
 
 ## Fonctions principales
 
-- Import de factures PDF, photos et archives ZIP (plus de 100 PDF) : import immédiat, puis lecture IA en file,
-  reprise automatique à l'ouverture de la page.
+- Initialisation depuis l’export METRO (Excel, ODS, CSV) : factures, produits et entrées de stock exacts, sans IA.
+- Import de factures PDF (quelques-unes par jour) : lecture IA, contrôles, entrées de stock et analyse des alertes enchaînés automatiquement.
+- Contenance calculée depuis la désignation (5KG, 500G, 6X150G, articles pesés) pour des prix au kg ou au litre justes.
+- Réglages d’import dans la configuration serveur (document `config/import` : parallele, mode, analyse, auto).
 - Contrôles automatiques : doublons, calculs de lignes, total facture, variations de prix ; analyse IA des alertes en parallèle.
 - Tableau de bord par date de document : 7 jours (par jour), 30 jours (par semaine), mois, trimestre, année.
